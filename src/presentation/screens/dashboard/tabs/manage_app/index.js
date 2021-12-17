@@ -79,13 +79,13 @@ const ManageApp = () => {
     {
       title: "News Feeds",
       desc: "View/Manage app news feeds",
-      to: "/news-feeds",
+      to: "/admin/dashboard/manage-app/news-feeds",
       image: newsImage,
     },
     {
       title: "Projects",
       desc: "View/Manage app projects",
-      to: "/projects",
+      to: "/admin/dashboard/manage-app/projects",
       image: projectsImage,
     },
     {

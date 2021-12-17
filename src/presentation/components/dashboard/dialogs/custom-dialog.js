@@ -72,7 +72,9 @@ const CustomDialog = (props) => {
       <Modal
         open={open}
         onClose={handleClose}
-        disableBackdropClick={true}
+        disablePortal={true}
+        disableEscapeKeyDown={true}
+        // disableBackdropClick={false}
         style={{
           display: "flex",
           alignItems: "center",

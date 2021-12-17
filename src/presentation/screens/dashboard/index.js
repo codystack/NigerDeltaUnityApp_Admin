@@ -14,7 +14,6 @@ import Drawer2 from "../../components/dashboard/drawer/Drawer2";
 
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import MoreIcon from "@mui/icons-material/MoreVert";
 
 import CircularProgress from "@mui/material/CircularProgress";
@@ -28,7 +27,11 @@ import ManageApp from "./tabs/manage_app";
 import ManageUsers from "./tabs/manage_users";
 import Profile from "./tabs/profile";
 
-import Categories from "./tabs/manage_app/categories";
+import Categories from "./tabs/manage_app/categories/categories";
+import NewsFeeds from "./tabs/manage_app/news/newsfeeds";
+import NewsItem from "./tabs/manage_app/news/news_item";
+import Projects from "./tabs/manage_app/projects";
+import ProjectItem from "./tabs/manage_app/projects/project_item";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -105,7 +108,7 @@ function Dashboard(props) {
   const classes = useStyles();
   const theme = useTheme();
   // let { path, url } = useRouteMatch();
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
   // const { notifications, userData } = useSelector((state) => state.user);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -362,6 +365,25 @@ function Dashboard(props) {
             <Route path="/admin/dashboard/manage-app/categories" exact={true}>
               <Categories />
             </Route>
+
+            <Route path="/admin/dashboard/manage-app/news-feeds" exact={true}>
+              <NewsFeeds />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/projects" exact={true}>
+              <Projects />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/news-feeds:id"
+              exact={true}
+            >
+              <NewsItem />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/projects:id" exact={true}>
+              <ProjectItem />
+            </Route>
           </Switch>
         </div>
         {/* <div style={{
@@ -377,10 +399,6 @@ function Dashboard(props) {
 }
 
 Dashboard.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
   window: PropTypes.func,
 };
 
