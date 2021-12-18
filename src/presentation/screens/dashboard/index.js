@@ -32,6 +32,7 @@ import NewsFeeds from "./tabs/manage_app/news/newsfeeds";
 import NewsItem from "./tabs/manage_app/news/news_item";
 import Projects from "./tabs/manage_app/projects";
 import ProjectItem from "./tabs/manage_app/projects/project_item";
+import Directories from "./tabs/manage_app/directories";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -372,6 +373,10 @@ function Dashboard(props) {
 
             <Route path="/admin/dashboard/manage-app/projects" exact={true}>
               <Projects />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/vendors" exact={true}>
+              <Directories />
             </Route>
 
             <Route

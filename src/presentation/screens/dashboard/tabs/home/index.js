@@ -92,9 +92,10 @@ const HomePage = () => {
         categories.push(doc.data());
       });
       setCategoriesList(categories);
-      console.log("Current cities in CA: ", categories);
     });
-    return () => {};
+    return () => {
+      setCategoriesList(null);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -106,7 +107,9 @@ const HomePage = () => {
       });
       setNewsList(news);
     });
-    return () => {};
+    return () => {
+      setNewsList(null);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -118,20 +121,24 @@ const HomePage = () => {
       });
       setProjectsList(proj);
     });
-    return () => {};
+    return () => {
+      setProjectsList(null);
+    };
   }, []);
 
-  React.useEffect(() => {
-    const q = query(collection(db, "users"), where("userType", "==", "public"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const usrs = [];
-      querySnapshot.forEach((doc) => {
-        usrs.push(doc.data());
-      });
-      setUsersList(usrs.slice(0, 5));
-    });
-    return () => {};
-  }, []);
+  // React.useEffect(() => {
+  //   const q = query(collection(db, "users"), where("userType", "==", "public"));
+  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //     const usrs = [];
+  //     querySnapshot.forEach((doc) => {
+  //       usrs.push(doc.data());
+  //     });
+  //     setUsersList(usrs.slice(0, 5));
+  //   });
+  //   return () => {
+  //     setUsersList([]);
+  //   };
+  // }, []);
 
   // if (usersList) {
   //   console.log("Filtered: ", usersList);

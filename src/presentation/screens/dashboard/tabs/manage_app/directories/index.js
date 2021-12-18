@@ -4,8 +4,8 @@ import Button from "@mui/material/Button";
 import { CardActionArea, Divider, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
+import CategoryDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
@@ -29,6 +29,11 @@ import Avatar from "@mui/material/Avatar";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import Paper from "@mui/material/Paper";
+import DirEditCategoryForm from "../../../../../forms/directories/edit_category";
+import DirAddCategoryForm from "../../../../../forms/directories/add_category";
+import AddVendorForm from "../../../../../forms/directories/add_vendor";
+import EditVendorForm from "../../../../../forms/directories/edit_vendor";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -88,15 +93,19 @@ const useStyles = makeStyles((theme) => ({
 
 const VendorItemCard = (props) => {
   const {
-    image,
-    title,
-    subTitle,
     id,
-    authorName,
-    authorPhoto,
-    body,
-    date,
+    image,
+    logo,
+    name,
+    address,
     category,
+    phone,
+    website,
+    description,
+    opensAt,
+    closesAt,
+    is24hrs,
+    blocked,
     item,
   } = props;
   const classes = useStyles();
@@ -105,7 +114,7 @@ const VendorItemCard = (props) => {
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
 
-  const deleteNews = () => {
+  const deleteVendor = () => {
     setOpenDelete(false);
     const fileRef = ref(storage, "news/" + id);
     const fileRef2 = ref(storage, "news/img_" + id);
@@ -137,7 +146,7 @@ const VendorItemCard = (props) => {
   const deleteBody = (
     <div>
       <Typography variant="body2" gutterBottom>
-        {`Are you sure you want to delete ${title} ?`}
+        {`Are you sure you want to delete ${name} ?`}
       </Typography>
       <br />
       <div className={classes.subRow}>
@@ -154,7 +163,7 @@ const VendorItemCard = (props) => {
           size="small"
           variant="contained"
           color="error"
-          onClick={deleteNews}
+          onClick={deleteVendor}
         >
           Delete
         </Button>
@@ -166,20 +175,23 @@ const VendorItemCard = (props) => {
     <>
       <CustomDialog
         open={open}
-        title="Update News"
+        title="Update Vendor"
         handleClose={() => setOpen(false)}
         bodyComponent={
-          <EditNewsForm
+          <EditVendorForm
             setOpen={setOpen}
             img={image}
-            title={title}
             id={id}
-            subTitle={subTitle}
-            authorName={authorName}
-            authorPhoto={authorPhoto}
-            body={body}
+            logo={logo}
+            name={name}
+            address={address}
+            phone={phone}
+            website={website}
             category={category}
-            date={date}
+            opensAt={opensAt}
+            closesAt={closesAt}
+            description={description}
+            is24hrs={is24hrs}
           />
         }
       />
@@ -192,19 +204,15 @@ const VendorItemCard = (props) => {
       <Card elevation={3} className={classes.root}>
         <div className={classes.rowHeader}>
           <div className={classes.lhsRow}>
-            <Avatar
-              alt="Passport"
-              src={authorPhoto}
-              className={classes.avatar}
-            />
-            <div className={classes.column}>
+            <Avatar alt="Passport" src={logo} className={classes.avatar} />
+            {/* <div className={classes.column}>
               <Typography variant="body2" fontSize={14}>
                 {authorName}
               </Typography>
               <Typography variant="body2" fontSize={13}>
                 {date}
               </Typography>
-            </div>
+            </div> */}
           </div>
           <div className={classes.subRow}>
             <IconButton
@@ -226,17 +234,23 @@ const VendorItemCard = (props) => {
         <CardActionArea
           onClick={() =>
             history.push({
-              pathname: "/admin/dashboard/manage-app/news-feeds:" + item?.id,
+              pathname: "/admin/dashboard/manage-app/vendors:" + item?.id,
               state: {
-                title: item?.title,
-                subTitle: item?.subTitle,
+                id: item?.id,
+                name: item?.name,
+                phone: item?.phone,
                 category: item?.category,
                 image: item?.image,
-                body: item?.body,
-                authorName: item?.authorName,
-                authorPhoto: item?.authorPhoto,
-                date: item?.createdAt,
-                id: item?.id,
+                description: item?.description,
+                logo: item?.logo,
+                address: item?.address,
+                website: item?.website,
+                blocked: item?.blocked,
+                opensAt: item?.opensAt,
+                closesAt: item?.closesAt,
+                is24hrs: item?.is24hrs,
+                createdAt: item?.createdAt,
+                updatedAt: item?.updatedAt,
               },
             })
           }
@@ -251,7 +265,7 @@ const VendorItemCard = (props) => {
               textAlign="start"
               fontWeight="bold"
             >
-              {title?.length > 75 ? title?.substring(0, 75) + "..." : title}
+              {name?.length > 75 ? name?.substring(0, 75) + "..." : name}
             </Typography>
           </div>
           <Typography
@@ -272,8 +286,108 @@ const VendorItemCard = (props) => {
             color="black"
             padding={1}
           >
-            {body?.length > 150 ? body?.substring(0, 150) + "..." : body}
+            {description?.length > 150
+              ? description?.substring(0, 150) + "..."
+              : description}
           </Typography>
+        </CardActionArea>
+      </Card>
+    </>
+  );
+};
+
+const VendorCategoryCard = (props) => {
+  const { id, name, updatedAt } = props;
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
+
+  const deleteItem = async () => {
+    setOpenDelete(false);
+    try {
+      await deleteDoc(doc(db, "directories-categories", "" + id));
+      setOpenDelete(false);
+      enqueueSnackbar(`Item deleted successfully`, { variant: "success" });
+    } catch (error) {
+      setOpenDelete(false);
+      enqueueSnackbar(`Item not deleted. Try again`, { variant: "error" });
+    }
+  };
+
+  const deleteBody = (
+    <div>
+      <Typography variant="body2" gutterBottom>
+        {`Are you sure you want to delete ${name} ?`}
+      </Typography>
+      <br />
+      <div className={classes.subRow}>
+        <Button
+          size="small"
+          variant="contained"
+          style={{ marginRight: 4 }}
+          onClick={() => setOpenDelete(false)}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          size="small"
+          variant="contained"
+          color="error"
+          onClick={deleteItem}
+        >
+          Delete
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <CustomDialog
+        open={open}
+        title="Update Category"
+        handleClose={() => setOpen(false)}
+        bodyComponent={
+          <DirEditCategoryForm setOpen={setOpen} title={name} id={id} />
+        }
+      />
+      <DeleteDialog
+        open={openDelete}
+        title="Delete Category"
+        handleClose={() => setOpenDelete(false)}
+        bodyComponent={deleteBody}
+      />
+      <Card elevation={2}>
+        <CardActionArea
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="body1" sx={{ marginLeft: 2 }}>
+            {name}
+          </Typography>
+          <div className={classes.subRow}>
+            <IconButton
+              aria-label="delete"
+              color="primary"
+              onClick={() => setOpen(true)}
+            >
+              <Edit />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              color="error"
+              onClick={() => setOpenDelete(true)}
+            >
+              <Delete />
+            </IconButton>
+          </div>
         </CardActionArea>
       </Card>
     </>
@@ -284,10 +398,23 @@ const Directories = () => {
   const classes = useStyles();
   const history = useHistory();
   const [open, setOpen] = React.useState(false);
+  const [openCategory, setOpenCategory] = React.useState(false);
   const [vendorsList, setVendorsList] = React.useState(null);
+  const [vendorCategories, setVendorCategories] = React.useState([]);
 
   React.useEffect(() => {
-    const q = query(collection(db, "vendors"));
+    const q = query(collection(db, "directories-categories"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const categories = [];
+      querySnapshot.forEach((doc) => {
+        categories.push(doc.data());
+      });
+      setVendorCategories(categories);
+    });
+  }, []);
+
+  React.useEffect(() => {
+    const q = query(collection(db, "directories-vendors"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const vendors = [];
       querySnapshot.forEach((doc) => {
@@ -301,9 +428,16 @@ const Directories = () => {
     <div>
       <CustomDialog
         open={open}
-        title="Create NewsFeed"
+        title="Create Vendor"
         handleClose={() => setOpen(false)}
-        bodyComponent={<AddNewsForm setOpen={setOpen} />}
+        bodyComponent={<AddVendorForm setOpen={setOpen} />}
+      />
+
+      <CategoryDialog
+        open={openCategory}
+        title="Create Category"
+        handleClose={() => setOpenCategory(false)}
+        bodyComponent={<DirAddCategoryForm setOpen={setOpenCategory} />}
       />
       <div className={classes.row}>
         <div className={classes.lhsRow}>
@@ -321,12 +455,50 @@ const Directories = () => {
           startIcon={<Add />}
           color="primary"
           variant="contained"
+          disabled={vendorCategories?.length < 1}
           onClick={() => setOpen(true)}
         >
-          Add Vendor
+          Vendor
         </Button>
       </div>
       <br />
+      <Paper
+        sx={{
+          padding: 2,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "left",
+          alignItems: "stretch",
+        }}
+      >
+        <Button
+          startIcon={<Add />}
+          color="primary"
+          variant="contained"
+          sx={{ marginRight: 2 }}
+          onClick={() => setOpenCategory(true)}
+        >
+          Category
+        </Button>
+
+        {vendorCategories && (
+          <Grid
+            container
+            spacing={{ xs: 2, md: 3 }}
+            columns={{ xs: 4, sm: 8, md: 12 }}
+          >
+            {vendorCategories?.map((item, index) => (
+              <Grid item xs={12} sm={6} md={6} key={index}>
+                <VendorCategoryCard
+                  item={item}
+                  id={vendorCategories[index]?.id}
+                  name={vendorCategories[index]?.name}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Paper>
       <div>
         {vendorsList && (
           <Grid
@@ -359,7 +531,7 @@ const Directories = () => {
           <div className={classes.main}>
             <div style={{ marginTop: "auto" }}>
               <CloudOffIcon fontSize="large" />
-              <Typography>No records found</Typography>
+              <Typography>No vendors found</Typography>
             </div>
           </div>
         )}

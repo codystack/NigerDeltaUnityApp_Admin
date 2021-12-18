@@ -91,7 +91,7 @@ const ManageApp = () => {
     {
       title: "Directories",
       desc: "View/Manage app directories",
-      to: "/directories",
+      to: "/admin/dashboard/manage-app/vendors",
       image: directoryImge,
     },
     {
