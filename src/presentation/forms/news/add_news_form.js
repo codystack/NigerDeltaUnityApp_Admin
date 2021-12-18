@@ -227,7 +227,7 @@ const AddNewsForm = (props) => {
       </Backdrop>
       <ValidatorForm onSubmit={createNews}>
         <Grid container spacing={1} padding={1}>
-          <Grid xs={12} sm={6} md={7}>
+          <Grid item xs={12} sm={6} md={7}>
             <TextValidator
               id="image"
               size="small"
@@ -245,7 +245,7 @@ const AddNewsForm = (props) => {
             />
           </Grid>
 
-          <Grid xs={12} sm={6} md={5}>
+          <Grid item xs={12} sm={6} md={5}>
             <div>
               {previewImage && (
                 <Avatar
@@ -321,7 +321,7 @@ const AddNewsForm = (props) => {
         />
 
         <Grid container spacing={1} padding={1} marginBottom={1}>
-          <Grid xs={12} sm={6} md={7}>
+          <Grid item xs={12} sm={6} md={7}>
             <div>
               <TextValidator
                 className={classes.mb}
@@ -353,7 +353,7 @@ const AddNewsForm = (props) => {
             </div>
           </Grid>
 
-          <Grid xs={12} sm={6} md={5}>
+          <Grid item xs={12} sm={6} md={5}>
             <div>
               {previewAuthor && (
                 <Avatar

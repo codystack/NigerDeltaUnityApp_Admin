@@ -22,25 +22,27 @@ function App() {
     try {
       const user = auth.currentUser;
       if (user) {
-        console.log("User Data: ", user);
+        // console.log("User Data: ", user);
+        //Fetch user data
         dispatch(setUserData(user));
       }
-      // auth().onAuthStateChanged((user) => {
-      //   if (user) {
-      //     //User is signed in. Save to redux store
-      //     console.log("USER: ", user);
-      //     dispatch(setUserData(user));
-      //     // var uid = user.uid;
-      //   } else {
-      //     //Not signed in
-      //     dispatch(setUserData(null));
-      //   }
-      // });
+
+      auth().onAuthStateChanged((user) => {
+        if (user) {
+          //User is signed in. Save to redux store
+          console.log("USER: ", user);
+          dispatch(setUserData(user));
+          // var uid = user.uid;
+        } else {
+          //Not signed in
+          dispatch(setUserData(null));
+        }
+      });
     } catch (err) {
       console.log(err);
     }
     // return () => {};
-  }, []);
+  }, [auth]);
 
   return (
     <div className="App">

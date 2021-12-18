@@ -15,16 +15,15 @@ import {
   doc,
   uploadBytesResumable,
   getDownloadURL,
-  query,
-  collection,
-  updateDoc,
-  onSnapshot,
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress, Grid, MenuItem } from "@mui/material";
 import { Typography } from "@mui/material";
+
+import Dropzone from "react-dropzone";
+import FormHelperText from "@mui/material/FormHelperText";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -90,17 +89,24 @@ const AddProjectForm = (props) => {
     "Edo State",
     "Rivers State",
   ]);
+  const [files, setFiles] = React.useState([]);
+  const [fileNames, setFileNames] = React.useState([]);
+  const [fileError, setFileError] = React.useState("");
 
-  //   React.useEffect(() => {
-  //     const q = query(collection(db, "categories"));
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       const categories = [];
-  //       querySnapshot.forEach((doc) => {
-  //         categories.push(doc.data());
-  //       });
-  //       setCategoriesList(categories);
-  //     });
-  //   }, []);
+  const handleDrop = (acceptedFiles) => {
+    setFileNames(acceptedFiles.map((file) => file.name));
+    setFiles(acceptedFiles);
+  };
+
+  const fileValidator = (file) => {
+    if (!file || file?.length < 1) {
+      return {
+        code: "name-too-large",
+        message: `You must select at least one file!`,
+      };
+    }
+    return null;
+  };
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
@@ -185,7 +191,7 @@ const AddProjectForm = (props) => {
       </Backdrop>
       <ValidatorForm onSubmit={createProject}>
         <Grid container spacing={1} padding={1}>
-          <Grid xs={12} sm={6} md={7}>
+          <Grid item xs={12} sm={6} md={7}>
             <TextValidator
               id="image"
               size="small"
@@ -203,7 +209,7 @@ const AddProjectForm = (props) => {
             />
           </Grid>
 
-          <Grid xs={12} sm={6} md={5}>
+          <Grid item xs={12} sm={6} md={5}>
             <div>
               {previewImage && (
                 <Avatar
@@ -265,6 +271,24 @@ const AddProjectForm = (props) => {
           validators={["required"]}
           errorMessages={["Project description is required"]}
         />
+
+        <Dropzone
+          onDrop={handleDrop}
+          validator={fileValidator}
+          accept={
+            "image/png, image/jpg, image/jpeg, application/pdf, application/mspowerpoint, application/powerpoint, application/vnd.ms-powerpoint, application/x-mspowerpoint"
+          }
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps({ className: classes.dropZone })}>
+              <input {...getInputProps()} />
+              <p>Drag'n'drop files, or click to select files</p>
+            </div>
+          )}
+        </Dropzone>
+        <FormHelperText style={{ color: "red" }}>
+          {files?.length < 1 ? fileError : null}
+        </FormHelperText>
 
         <Button
           type="submit"

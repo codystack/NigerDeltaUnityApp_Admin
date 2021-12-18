@@ -262,7 +262,7 @@ const EditProjectForm = (props) => {
       </Backdrop>
       <ValidatorForm onSubmit={updateProject}>
         <Grid container spacing={1} padding={1}>
-          <Grid xs={12} sm={6} md={7}>
+          <Grid item xs={12} sm={6} md={7}>
             <TextValidator
               id="image"
               size="small"
@@ -278,7 +278,7 @@ const EditProjectForm = (props) => {
             />
           </Grid>
 
-          <Grid xs={12} sm={6} md={5}>
+          <Grid item xs={12} sm={6} md={5}>
             <div>
               <Avatar
                 variant="rounded"

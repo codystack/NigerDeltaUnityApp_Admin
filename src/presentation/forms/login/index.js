@@ -14,6 +14,7 @@ import {
   setPersistence,
   browserSessionPersistence,
   auth,
+  onSnapshot,
 } from "../../../data/firebase";
 
 import InputAdornment from "@mui/material/InputAdornment";
@@ -70,22 +71,30 @@ const LoginForm = () => {
         signInUser(formValues.email, formValues.password)
           .then(async (resp) => {
             //Now get user data
-            const docRef = doc(db, "users", resp.user.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              dispatch(setUserData(docSnap.data));
+            // const docRef = doc(db, "users", resp.user.uid);
+            onSnapshot(doc(db, "users", resp.user.uid), (doc) => {
+              console.log("Current data: ", doc.data());
+              dispatch(setUserData(doc.data()));
               history.push("/admin/dashboard");
-            } else {
-              console.log("No such document!");
-            }
+            });
+            // const docSnap = await getDoc(docRef);
+            // if (docSnap.exists()) {
+
+            // } else {
+            //   console.log("No such document!");
+            // }
           })
-          .catch((err) => {});
-        // console.log("NUI", resp);
+          .catch((err) => {
+            console.log("LOGIN ERR: ", err?.message);
+          });
+        //
       })
       .catch((error) => {
         // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
+        // const errorCode = error.code;
+        // const errorMessage = error.message;
+        console.log("LOGIN CODE: ", error?.code);
+        console.log("LOGIN ERR: ", error?.message);
       });
   };
 

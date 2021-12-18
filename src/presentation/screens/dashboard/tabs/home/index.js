@@ -94,6 +94,7 @@ const HomePage = () => {
       setCategoriesList(categories);
       console.log("Current cities in CA: ", categories);
     });
+    return () => {};
   }, []);
 
   React.useEffect(() => {
@@ -105,6 +106,7 @@ const HomePage = () => {
       });
       setNewsList(news);
     });
+    return () => {};
   }, []);
 
   React.useEffect(() => {
@@ -116,6 +118,7 @@ const HomePage = () => {
       });
       setProjectsList(proj);
     });
+    return () => {};
   }, []);
 
   React.useEffect(() => {
@@ -127,6 +130,7 @@ const HomePage = () => {
       });
       setUsersList(usrs.slice(0, 5));
     });
+    return () => {};
   }, []);
 
   // if (usersList) {
@@ -168,26 +172,28 @@ const HomePage = () => {
   return (
     <div>
       <Grid container spacing={3}>
-        <Grid xs={12} sm={7} md={7}>
+        <Grid item xs={12} sm={7} md={7}>
           <div style={{ display: "flex", height: "100%", padding: 4 }}>
             <div style={{ flexGrow: 1 }}>
-              <DataGrid
-                rows={usersList}
-                columns={columns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
-                checkboxSelection
-                disableSelectionOnClick
-                components={{
-                  NoRowsOverlay: CustomNoRowsOverlay,
-                  Toolbar: CustomToolbar,
-                }}
-              />
+              {usersList && (
+                <DataGrid
+                  rows={usersList}
+                  columns={columns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  checkboxSelection
+                  disableSelectionOnClick
+                  components={{
+                    NoRowsOverlay: CustomNoRowsOverlay,
+                    Toolbar: CustomToolbar,
+                  }}
+                />
+              )}
             </div>
           </div>
         </Grid>
 
-        <Grid xs={12} sm={5} md={5}>
+        <Grid item xs={12} sm={5} md={5}>
           <Card sx={{ mb: 3, mt: 3 }}>
             <div className={classes.row} style={{ padding: 10 }}>
               <Typography>Total categories</Typography>

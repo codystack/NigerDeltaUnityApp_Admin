@@ -8,6 +8,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useHistory } from "react-router-dom";
 import LoginForm from "../../forms/login";
+import pattern from "../../../assets/images/pattern.png";
 
 function Copyright(props) {
   return (
@@ -57,15 +58,7 @@ const Login = () => {
     >
       <CssBaseline />
 
-      <Grid
-        item
-        xs={12}
-        sm={8}
-        md={6}
-        className="login-glass"
-        component="div"
-        square
-      >
+      <Grid item xs={12} sm={8} md={6} component="div">
         <Box
           sx={{
             my: 8,
@@ -91,9 +84,20 @@ const Login = () => {
         md={6}
         sx={{
           height: "100vh",
-          backgroundColor: "white",
+          backgroundColor: "#0C0C77",
         }}
-      />
+      >
+        <div
+          className="login-glass"
+          style={{
+            height: "100vh",
+            backgroundImage: "url(" + pattern + ")",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+      </Grid>
     </Grid>
   );
 };
