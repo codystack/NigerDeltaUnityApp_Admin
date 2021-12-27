@@ -9,12 +9,10 @@ import {
   storage,
   setDoc,
   doc,
-  uploadBytes,
   uploadBytesResumable,
   getDownloadURL,
 } from "../../../data/firebase/";
 import { useSnackbar } from "notistack";
-import { addCategory } from "../../../domain/service";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
@@ -171,7 +169,7 @@ const CategoryForm = (props) => {
           type="file"
           fullWidth
           disabled={isLoading}
-          accept=".png, .jpg, .jpeg, .pdf"
+          accept=".png, .jpg, .jpeg"
           onChange={handleChange}
           validators={["required"]}
           errorMessages={["Category image is required"]}

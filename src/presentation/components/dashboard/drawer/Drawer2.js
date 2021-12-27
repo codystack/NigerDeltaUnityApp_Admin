@@ -19,6 +19,10 @@ import logo from "../../../../assets/images/icon_blue.png";
 import { useSnackbar } from "notistack";
 import Skeleton from "@mui/material/Skeleton";
 
+import { auth } from "../../../../data/firebase";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../../../../data/store/slice/user";
+
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -43,7 +47,7 @@ const Drawer2 = (props) => {
   const { history } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   // const { userStatus, userData } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
   const container =
@@ -123,23 +127,21 @@ const Drawer2 = (props) => {
   const signOut = async () => {
     props.handleBackdrop(true);
     try {
+      await auth.signOut();
+      dispatch(setUserData(null));
       props.handleBackdrop(false);
       enqueueSnackbar(`Successfully logged out`, { variant: "success" });
       history.replace({
-        pathname: "/community-rep",
+        pathname: "/login",
       });
     } catch (err) {
-      enqueueSnackbar(
-        `${
-          err?.response?.data?.error ||
-          err?.response?.statusText ||
-          "Check your internet connection."
-        }`,
-        { variant: "error" }
-      );
-    } finally {
-      history.go(0);
+      enqueueSnackbar(`${err?.message || "Check your internet connection."}`, {
+        variant: "error",
+      });
     }
+    // finally {
+    //   history.go(0);
+    // }
   };
 
   const myDrawer = (
@@ -208,9 +210,10 @@ const Drawer2 = (props) => {
         style={{
           flexDirection: "column",
           marginTop: "auto",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          padding: 24,
+          marginRight: "auto",
+          justifyContent: "left",
+          alignItems: "start",
+          padding: 16,
         }}
       >
         <Button

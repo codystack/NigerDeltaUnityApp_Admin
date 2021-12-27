@@ -499,6 +499,7 @@ const Directories = () => {
           </Grid>
         )}
       </Paper>
+      <br />
       <div>
         {vendorsList && (
           <Grid
@@ -507,11 +508,39 @@ const Directories = () => {
             columns={{ xs: 4, sm: 8, md: 12 }}
           >
             {vendorsList?.map((item, index) => (
-              <Grid item xs={12} sm={6} md={6} key={index}>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={6}
+                key={index}
+                onClick={() =>
+                  history.push({
+                    pathname: "/admin/dashboard/manage-app/vendors:" + item?.id,
+                    state: {
+                      name: vendorsList[index]?.name,
+                      address: vendorsList[index]?.address,
+                      phone: vendorsList[index]?.phone,
+                      image: vendorsList[index]?.image,
+                      website: vendorsList[index]?.website,
+                      opensAt: vendorsList[index]?.opensAt,
+                      closesAt: vendorsList[index]?.closesAt,
+                      description: vendorsList[index]?.description,
+                      createdAt: vendorsList[index]?.createdAt,
+                      updatedAt: vendorsList[index]?.updatedAt,
+                      category: vendorsList[index]?.category,
+                      logo: vendorsList[index]?.logo,
+                      id: vendorsList[index]?.id,
+                      is24hrs: vendorsList[index]?.is24Hours,
+                    },
+                  })
+                }
+              >
                 <VendorItemCard
                   item={item}
                   id={vendorsList[index]?.id}
                   image={vendorsList[index]?.image}
+                  logo={vendorsList[index]?.logo}
                   name={vendorsList[index]?.name}
                   address={vendorsList[index]?.address}
                   phone={vendorsList[index]?.phone}

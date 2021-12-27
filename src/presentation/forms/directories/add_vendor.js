@@ -23,7 +23,13 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress, Grid, IconButton, MenuItem } from "@mui/material";
+import {
+  Checkbox,
+  CircularProgress,
+  Grid,
+  IconButton,
+  MenuItem,
+} from "@mui/material";
 import { Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { CameraAlt } from "@mui/icons-material";
@@ -43,6 +49,12 @@ const useStyles = makeStyles((theme) => ({
   mb: {
     marginBottom: 10,
   },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   subRow: {
     display: "flex",
     flexDirection: "row",
@@ -50,6 +62,31 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
 }));
+
+const timesOpen = [
+  "05:00 AM",
+  "06:00 AM",
+  "07:00 AM",
+  "08:00 AM",
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+];
+
+const timesClosed = [
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM",
+  "05:00 PM",
+  "06:00 PM",
+  "07:00 PM",
+  "08:00 PM",
+  "09:00 PM",
+  "10:00 PM",
+  "11:00 PM",
+  "12:00 AM",
+];
 
 const CircularProgressWithLabel = (props) => {
   return (
@@ -107,6 +144,7 @@ const AddVendorForm = (props) => {
   const { enqueueSnackbar } = useSnackbar();
   const [categoriesList, setCategoriesList] = React.useState(null);
   const coverRef = React.useRef();
+  const [is24Hrs, setIs24Hrs] = React.useState(false);
 
   React.useEffect(() => {
     const q = query(collection(db, "directories-categories"));
@@ -175,9 +213,9 @@ const AddVendorForm = (props) => {
             phone: formValues.phone,
             website: formValues.website,
             description: formValues.description,
-            opensAt: formValues.opensAt,
-            closesAt: formValues.closesAt,
-            is24Hours: formValues.is24Hrs,
+            opensAt: is24Hrs ? " " : formValues.opensAt,
+            closesAt: is24Hrs ? " " : formValues.closesAt,
+            is24Hours: is24Hrs,
             logo: " ",
             blocked: false,
             createdAt: timeNow,
@@ -291,7 +329,7 @@ const AddVendorForm = (props) => {
             display: "flex",
             flexDirection: "column",
             height: 144,
-            width: 400,
+            width: 420,
             backgroundImage: "url(" + previewImage + ")",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -311,7 +349,12 @@ const AddVendorForm = (props) => {
           >
             <label
               htmlFor="logo"
-              style={{ zIndex: 1000, display: "flex", flexDirection: "row" }}
+              style={{
+                zIndex: 1000,
+                display: "flex",
+                flexDirection: "row",
+                padding: 5,
+              }}
             >
               <Avatar
                 variant="circular"
@@ -319,9 +362,12 @@ const AddVendorForm = (props) => {
                 src={previewLogo}
                 className={classes.logo}
               />
-              <label htmlFor="logo" sx={{ ml: -6, mt: 0 }}>
+              <label htmlFor="logo" style={{ marginTop: 16, marginLeft: -10 }}>
                 <div className={classes.subRow}>
-                  <CameraAlt color="primary" fontSize="small" />
+                  <CameraAlt
+                    style={{ color: "white", zIndex: 10000 }}
+                    fontSize="small"
+                  />
                 </div>
               </label>
             </label>
@@ -350,8 +396,8 @@ const AddVendorForm = (props) => {
                 errorMessages={["Vendor's category is required"]}
               >
                 {(categoriesList ?? [])?.map((item, index) => (
-                  <MenuItem key={index} value={item?.title ?? ""}>
-                    {item?.title ?? ""}
+                  <MenuItem key={index} value={item?.name ?? ""}>
+                    {item?.name ?? ""}
                   </MenuItem>
                 ))}
               </SelectValidator>
@@ -446,6 +492,64 @@ const AddVendorForm = (props) => {
           validators={["required"]}
           errorMessages={["Vendor's description is required"]}
         />
+
+        <div className={classes.row}>
+          {!is24Hrs ? (
+            <Grid container spacing={1} padding={0} marginBottom={0}>
+              <Grid item xs={12} sm={6} md={6}>
+                <div>
+                  <SelectValidator
+                    className={classes.mb}
+                    value={formValues.opensAt}
+                    onChange={handleChange}
+                    label="Opens By"
+                    name="opensAt"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    validators={["required"]}
+                    errorMessages={["Opening time is required"]}
+                  >
+                    {(timesOpen ?? [])?.map((item, index) => (
+                      <MenuItem key={index} value={item ?? ""}>
+                        {item ?? ""}
+                      </MenuItem>
+                    ))}
+                  </SelectValidator>
+                </div>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <div>
+                  <SelectValidator
+                    className={classes.mb}
+                    value={formValues.closesAt}
+                    onChange={handleChange}
+                    label="Closes By"
+                    name="closesAt"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    validators={["required"]}
+                    errorMessages={["Closing time is required"]}
+                  >
+                    {(timesClosed ?? [])?.map((item, index) => (
+                      <MenuItem key={index} value={item ?? ""}>
+                        {item ?? ""}
+                      </MenuItem>
+                    ))}
+                  </SelectValidator>
+                </div>
+              </Grid>
+            </Grid>
+          ) : (
+            <Typography>Always open 24/7</Typography>
+          )}
+          <div className={classes.subRow}>
+            <Typography fontSize={14}>Always open</Typography>
+            <Checkbox value={is24Hrs} onChange={() => setIs24Hrs(!is24Hrs)} />
+          </div>
+        </div>
 
         <Button
           type="submit"

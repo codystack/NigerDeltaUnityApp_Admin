@@ -166,19 +166,16 @@ const LoginForm = () => {
         >
           Log In
         </Button>
-        <Grid container>
-          <Grid item xs>
-            <Link href="#" variant="body2">
-              Forgot password?
-            </Link>
-          </Grid>
-          <Grid item>
-            <Link href="/signup" variant="body2">
+        <div>
+          <div>Forgot password?</div>
+
+          {/* <div>
+            <Link variant="body2" onClick={() => history.push("/signup")}>
               {"Don't have an account? Sign Up"}
             </Link>
-          </Grid>
-        </Grid>
-        <Copyright sx={{ mt: 5 }} />
+          </div> */}
+        </div>
+        {/* <Copyright sx={{ mt: 5 }} /> */}
       </ValidatorForm>
     </div>
   );

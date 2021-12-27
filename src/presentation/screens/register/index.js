@@ -8,6 +8,8 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import SignupForm from "../../forms/register";
+import pattern from "../../../assets/images/pattern.png";
+import logo from "../../../assets/images/logo_white.png";
 
 const Signup = () => {
   const handleSubmit = (event) => {
@@ -21,7 +23,16 @@ const Signup = () => {
   };
 
   return (
-    <Grid container component="main" sx={{ height: "100vh" }}>
+    <Grid
+      container
+      component="main"
+      sx={{
+        height: "100vh",
+        backgroundColor: (t) =>
+          t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
+        backgroundPosition: "center",
+      }}
+    >
       <CssBaseline />
       <Grid
         item
@@ -29,27 +40,51 @@ const Signup = () => {
         sm={4}
         md={6}
         sx={{
-          backgroundImage: "url(https://source.unsplash.com/random)",
-          backgroundRepeat: "no-repeat",
-          backgroundColor: (t) =>
-            t.palette.mode === "light"
-              ? t.palette.grey[50]
-              : t.palette.grey[900],
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          height: "100vh",
+          backgroundColor: "#0C0C77",
         }}
-      />
+      >
+        <div
+          // className="login-glass"
+          style={{
+            height: "100vh",
+            backgroundImage: "url(" + pattern + ")",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 1000,
+          }}
+        >
+          <Box
+            component="div"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              my: "auto",
+              height: "100%",
+            }}
+          >
+            <img src={logo} alt="img" width={156} />
+            <Typography variant="h6" align="center" color="white">
+              Niger Delta Unity App (NDUA)
+            </Typography>
+          </Box>
+        </div>
+      </Grid>
       <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6}>
         <Box
           sx={{
-            my: 8,
-            mx: 4,
             display: "flex",
             flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
+            my: "auto",
+            height: "100%",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5" gutterBottom>

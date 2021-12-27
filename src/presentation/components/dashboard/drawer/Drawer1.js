@@ -15,13 +15,13 @@ import { makeStyles, useTheme } from "@mui/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import logo from "../../../../assets/images/icon_blue.png";
-// import {
-//   setUserRole,
-//   setUserData,
-//   setUserStatus,
-// } from "../../../../../CAMPUS-web/src/redux/slice/user";
+
 import { useSnackbar } from "notistack";
 import Skeleton from "@mui/material/Skeleton";
+
+import { auth } from "../../../../data/firebase";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../../../../data/store/slice/user";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -46,8 +46,7 @@ const Drawer1 = (props) => {
   const classes = useStyles();
   const { history, mobileOpen, setMobileOpen } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  // const { userStatus, userData } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
   const container =
@@ -128,27 +127,21 @@ const Drawer1 = (props) => {
   const signOut = async () => {
     props.handleBackdrop(true);
     try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userType");
-      // await axios.post("/logout/admins/" + userData?._id);
-
+      await auth.signOut();
+      dispatch(setUserData(null));
       props.handleBackdrop(false);
       enqueueSnackbar(`Successfully logged out`, { variant: "success" });
       history.replace({
-        pathname: "/community-rep",
+        pathname: "/login",
       });
     } catch (err) {
-      enqueueSnackbar(
-        `${
-          err?.response?.data?.error ||
-          err?.response?.statusText ||
-          "Check your internet connection."
-        }`,
-        { variant: "error" }
-      );
-    } finally {
-      history.go(0);
+      enqueueSnackbar(`${err?.message || "Check your internet connection."}`, {
+        variant: "error",
+      });
     }
+    // finally {
+    //   history.go(0);
+    // }
   };
 
   const myDrawer = (
@@ -217,9 +210,10 @@ const Drawer1 = (props) => {
         style={{
           flexDirection: "column",
           marginTop: "auto",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          padding: 24,
+          marginRight: "auto",
+          justifyContent: "left",
+          alignItems: "start",
+          padding: 16,
         }}
       >
         <Button

@@ -5,7 +5,6 @@ import { CardActionArea, Divider, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
@@ -24,14 +23,11 @@ import {
   deleteDoc,
 } from "../../../../../../data/firebase";
 import { useSnackbar } from "notistack";
-import AddNewsForm from "../../../../../forms/news/add_news_form";
-import Avatar from "@mui/material/Avatar";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import EditProjectForm from "../../../../../forms/projects/update_project_form";
 import AddProjectForm from "../../../../../forms/projects/add_project_form";
-import format from "date-fns/format";
 
 const useStyles = makeStyles((theme) => ({
   root: {

@@ -2,141 +2,132 @@ import * as React from "react";
 import {
   DataGrid,
   GridToolbarContainer,
-  GridColumnsToolbarButton,
-  GridFilterToolbarButton,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
   GridToolbarExport,
-} from "@mui/";
-import Avatar from "@material-ui/core/Avatar";
-import axios from "axios";
-import TimeAgo from "../../countdown/timeago";
-import ActionButton from "../../button/ActionButton";
-import CustomNoRowsOverlay from "../../skeleton/CustomNoRowsOverlay";
-import { useTheme } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
+  GridToolbarDensitySelector,
+} from "@mui/x-data-grid";
+// import { useDemoData } from "@mui/x-data-grid-generator";
+import {
+  onSnapshot,
+  query,
+  where,
+  collection,
+  db,
+} from "../../../../data/firebase";
+import Avatar from "@mui/material/Avatar";
+import CustomNoRowsOverlay from "../../misc/placeholder/custom_no_data";
+import ActionButton from "./action_button";
 
-const CustomToolbar = () => {
-  const theme = useTheme();
-
+function CustomToolbar() {
   return (
-    <GridToolbarContainer
-      color="secondary"
-      style={{
-        display: "flex",
-        padding: 16,
-      }}
-    >
-      <Paper style={{ padding: 6, borderRadius: 10 }}>
-        <GridColumnsToolbarButton />
-      </Paper>
-      <Paper
-        style={{ padding: 6, borderRadius: 10, marginLeft: 5, marginRight: 5 }}
-      >
-        <GridFilterToolbarButton />
-      </Paper>
-      <Paper
-        style={{
-          alignSelf: "flex-end",
-          padding: 6,
-          marginLeft: "auto",
-          borderRadius: 10,
-        }}
-      >
-        <GridToolbarExport />
-      </Paper>
+    <GridToolbarContainer>
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarExport />
     </GridToolbarContainer>
   );
-};
+}
 
-const fetcher = (url) =>
-  axios
-    .get(url, {
-      headers: {
-        Authorization: localStorage.getItem("token"),
+export default function UserTable() {
+  const columns = [
+    {
+      field: "photo",
+      headerName: "Image",
+      width: 75,
+      renderCell: (params) => (
+        <Avatar alt="Profile Picture" src={params.value} />
+      ),
+    },
+    {
+      field: "fullName",
+      headerName: "Full name",
+      description: "This column has a value getter and is not sortable.",
+      sortable: false,
+      width: 160,
+      valueGetter: (params) =>
+        `${params.row.firstname || ""} ${params.row.lastname || ""}`,
+    },
+    {
+      field: "email",
+      headerName: "Email Address",
+      width: 165,
+    },
+    {
+      field: "phone",
+      headerName: "Phone",
+      width: 128,
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      width: 86,
+    },
+    {
+      field: "state",
+      headerName: "State of Origin",
+      width: 100,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 96,
+    },
+    {
+      field: "id",
+      headerName: "ACTIONS",
+      width: 130,
+      renderCell: (params) => {
+        return (
+          <ActionButton
+            selected={params}
+            type="scholars"
+            // setIsPerforming={setIsPerforming}
+            // handleSetSelectedRow={props.handleSetSelectedRow}
+          />
+        );
       },
-    })
-    .then((res) => res.data);
+    },
+  ];
 
-export default function UsersTable({ setIsPerforming }) {
-  const [filterData, setfilterData] = React.useState([]);
-  const [isLoading, setIsloading] = React.useState(true);
+  // const { data } = useDemoData({
+  //   dataSet: "Commodity",
+  //   rowLength: 10,
+  //   maxColumns: 6,
+  // });
 
-  // const { data } = useSWR('/applicants/scholars/all', fetcher);
+  const [usersList, setUsersList] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  // React.useEffect(() => {
-  //     if (data) {
-  //         setIsloading(false);
-  //         setfilterData(data.map(item => ({ id: item._id, ...item, ...item.Details })))
-  //     }
-  // }, [data])
+  React.useEffect(() => {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("userType", "==", "public"));
+    onSnapshot(q, (querySnapshot) => {
+      const usrs = [];
+      querySnapshot.forEach((doc) => {
+        usrs.push(doc.data());
+      });
+      setUsersList(usrs);
+    });
+    return () => {
+      setUsersList([]);
+    };
+  }, []);
+
+  if (usersList) {
+    console.log("Filtered: ", usersList);
+  }
 
   return (
-    <div style={{ height: 520, width: "100%" }}>
+    <div style={{ height: 400, width: "100%" }}>
       <DataGrid
-        columns={[
-          {
-            field: "Passport",
-            headerName: "PASSPORT",
-            width: 100,
-            renderCell: (params) => (
-              <Avatar alt="Profile Picture" src={params.value} />
-            ),
-          },
-          {
-            field: "Name",
-            headerName: "FULL NAME",
-            width: 200,
-            sortable: false,
-            valueGetter: (params) =>
-              `${params.getValue("First_Name") || ""} ${
-                params.getValue("Surname") || ""
-              }`,
-          },
-          { field: "Phone_Number", headerName: "PHONE NUMBER", width: 180 },
-          { field: "Email_Address", headerName: "EMAIL ADDRESS", width: 180 },
-          // {
-          //     field: "Gender",
-          //     headerName: "GENDER",
-          // },
-          // {
-          //     field: "Community",
-          //     headerName: "COMMUNITY",
-          //     width: 150,
-          // },
-          {
-            field: "Created_At",
-            headerName: "DATE",
-            type: "date",
-            renderCell: (params) => {
-              return <TimeAgo dateString={params.value} variant="body1" />;
-            },
-          },
-
-          {
-            field: "id",
-            headerName: "ACTIONS",
-            width: 130,
-            renderCell: (params) => {
-              return (
-                <ActionButton
-                  selected={params}
-                  setIsPerforming={setIsPerforming}
-                  // handleSetSelectedRow={props.handleSetSelectedRow}
-                />
-              );
-            },
-          },
-        ]}
-        rows={filterData}
-        density="comfortable"
-        loading={isLoading}
-        rowHeight={45}
-        pagination
-        // rowCount={data?.total}
-        paginationMode="client"
-        disableSelectionOnClick={true}
+        // {...data}
+        rows={usersList}
+        columns={columns}
         components={{
-          NoRowsOverlay: CustomNoRowsOverlay,
           Toolbar: CustomToolbar,
+          NoRowsOverlay: CustomNoRowsOverlay,
         }}
       />
     </div>

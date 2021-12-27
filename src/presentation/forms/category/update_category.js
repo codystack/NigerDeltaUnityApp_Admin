@@ -63,7 +63,7 @@ const EditCategoryForm = (props) => {
   const classes = useStyles();
   let { setOpen, img, name, id } = props;
   const [formValues, setFormValues] = React.useState({
-    title: "",
+    title: " ",
     image: "",
   });
   const [file, setFile] = React.useState(null);
@@ -192,7 +192,13 @@ const EditCategoryForm = (props) => {
           label="Category name"
           size="small"
           variant="outlined"
-          value={formValues.title ? formValues.title : name}
+          value={
+            formValues.title === " "
+              ? name
+              : !formValues.title
+              ? ""
+              : formValues.title
+          }
           onChange={handleChange}
           // onBlur={handleBlur}
           name="title"

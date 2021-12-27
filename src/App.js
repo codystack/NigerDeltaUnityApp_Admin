@@ -12,8 +12,9 @@ import {
 import React from "react";
 import { auth } from "./data/firebase";
 import { useDispatch } from "react-redux";
-
+import { db, doc, onSnapshot } from "./data/firebase";
 import { setUserData } from "./data/store/slice/user";
+import NotFound from "./presentation/screens/notfound";
 
 function App() {
   const dispatch = useDispatch();
@@ -22,27 +23,27 @@ function App() {
     try {
       const user = auth.currentUser;
       if (user) {
-        // console.log("User Data: ", user);
-        //Fetch user data
-        dispatch(setUserData(user));
+        onSnapshot(doc(db, "users", "" + user.uid), (doc) => {
+          // userData(doc.data());
+          dispatch(setUserData(doc.data()));
+          console.log(doc.data());
+        });
       }
 
-      auth().onAuthStateChanged((user) => {
-        if (user) {
-          //User is signed in. Save to redux store
-          console.log("USER: ", user);
-          dispatch(setUserData(user));
-          // var uid = user.uid;
-        } else {
-          //Not signed in
-          dispatch(setUserData(null));
-        }
-      });
+      // auth().onAuthStateChanged((user) => {
+      //   if (user) {
+      //     onSnapshot(doc(db, "users", "" + user.uid), (doc) => {
+      //       dispatch(setUserData(doc.data()));
+      //     });
+      //   } else {
+      //     dispatch(setUserData(null));
+      //   }
+      // });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
     // return () => {};
-  }, [auth]);
+  }, []);
 
   return (
     <div className="App">
@@ -56,13 +57,17 @@ function App() {
             <Login />
           </PrivateRouteLogin>
 
-          <PrivateRouteSignup exact={true} path="/signup">
+          {/* <PrivateRouteSignup exact={true} path="/signup">
             <Signup />
-          </PrivateRouteSignup>
+          </PrivateRouteSignup> */}
 
           <PrivateRouteDashboard path="/admin/dashboard">
             <Dashboard />
           </PrivateRouteDashboard>
+
+          <Route path="*">
+            <NotFound />
+          </Route>
         </Switch>
       </BrowserRouter>
     </div>

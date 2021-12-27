@@ -10,9 +10,12 @@ import { makeStyles } from "@mui/styles";
 import categoryImage from "../../../../../assets/images/category_ndua_admin.jpeg";
 import directoryImge from "../../../../../assets/images/directories_ndua_admin.jpeg";
 import newsImage from "../../../../../assets/images/news_ndua_admin.jpeg";
-// import vendorsLogo from "../../../../../assets/images/vendors_ndua_admin.jpeg";
 import projectsImage from "../../../../../assets/images/projects_ndua_admin.jpeg";
 import adsImage from "../../../../../assets/images/ads_ndua_admin.jpeg";
+import privacyImage from "../../../../../assets/images/privacy.jpeg";
+import termsImage from "../../../../../assets/images/terms_of_service.jpeg";
+import contactUsImage from "../../../../../assets/images/handshake.jpeg";
+
 import Grid from "@mui/material/Grid";
 import { useHistory } from "react-router-dom";
 
@@ -72,33 +75,51 @@ const ManageApp = () => {
   let list = [
     {
       title: "Categories",
-      desc: "View/Manage app categories",
+      desc: "Manage app categories",
       to: "/admin/dashboard/manage-app/categories",
       image: categoryImage,
     },
     {
       title: "News Feeds",
-      desc: "View/Manage app news feeds",
+      desc: "Manage app news feeds",
       to: "/admin/dashboard/manage-app/news-feeds",
       image: newsImage,
     },
     {
       title: "Projects",
-      desc: "View/Manage app projects",
+      desc: "Manage app projects",
       to: "/admin/dashboard/manage-app/projects",
       image: projectsImage,
     },
     {
       title: "Directories",
-      desc: "View/Manage app directories",
+      desc: "Manage app directories",
       to: "/admin/dashboard/manage-app/vendors",
       image: directoryImge,
     },
     {
       title: "Ads Center",
-      desc: "View/Manage adverts",
+      desc: "Manage adverts",
       to: "/ads-center",
       image: adsImage,
+    },
+    {
+      title: "Privacy Policy",
+      desc: "Manage privacy",
+      to: "/admin/dashboard/manage-app/privacy-policy",
+      image: privacyImage,
+    },
+    {
+      title: "Terms of Service",
+      desc: "Manage terms of service",
+      to: "/admin/dashboard/manage-app/terms-of-service",
+      image: termsImage,
+    },
+    {
+      title: "Contact Us",
+      desc: "Manage contact us",
+      to: "/admin/dashboard/manage-app/contact-us",
+      image: contactUsImage,
     },
   ];
 

@@ -33,6 +33,11 @@ import NewsItem from "./tabs/manage_app/news/news_item";
 import Projects from "./tabs/manage_app/projects";
 import ProjectItem from "./tabs/manage_app/projects/project_item";
 import Directories from "./tabs/manage_app/directories";
+import PrivacyPolicy from "./tabs/manage_app/privacy-policy";
+import TermsOfService from "./tabs/manage_app/terms-of-service";
+import ContactUs from "./tabs/manage_app/contact-us";
+import VendorItem from "./tabs/manage_app/directories/vendor_detail";
+import ProductDetail from "./tabs/manage_app/directories/product_detail";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -377,6 +382,35 @@ function Dashboard(props) {
 
             <Route path="/admin/dashboard/manage-app/vendors" exact={true}>
               <Directories />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/vendors:id" exact={true}>
+              <VendorItem />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/vendors:id/products:de"
+              exact={true}
+            >
+              <ProductDetail />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/privacy-policy"
+              exact={true}
+            >
+              <PrivacyPolicy />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/contact-us" exact={true}>
+              <ContactUs />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/terms-of-service"
+              exact={true}
+            >
+              <TermsOfService />
             </Route>
 
             <Route

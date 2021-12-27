@@ -229,13 +229,8 @@ const SignupForm = () => {
         >
           Sign In
         </Button>
-        <Typography variant="body1" component="h1">
-          Or
-        </Typography>
-        {/* <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }}>
-          Sign In With Google
-        </Button> */}
-        <Link href="#" variant="body2">
+        <Typography variant="body1" component="h1" />
+        <Link onClick={() => history.push("/login")} variant="body2">
           {"Already have an account? Login"}
         </Link>
         {/* <Copyright sx={{ mt: 5 }} /> */}
