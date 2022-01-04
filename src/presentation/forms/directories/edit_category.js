@@ -38,10 +38,9 @@ const DirEditCategoryForm = (props) => {
       title: formValues.title ? formValues.title : title,
     });
     //No image is changed. So update all text
-    console.log("ID: ", id);
     const timeNow = new Date();
     try {
-      const mRef = doc(db, "directories/categories", "" + id);
+      const mRef = doc(db, "directories-categories", "" + id);
       await updateDoc(mRef, {
         id: timeNow.getTime(),
         name: formValues.title,
@@ -77,7 +76,7 @@ const DirEditCategoryForm = (props) => {
         <TextValidator
           className={classes.mb}
           id="title"
-          label="News title"
+          label="Title"
           size="small"
           variant="outlined"
           value={
@@ -91,7 +90,7 @@ const DirEditCategoryForm = (props) => {
           name="title"
           fullWidth
           validators={["required"]}
-          errorMessages={["News title is required"]}
+          errorMessages={["Title is required"]}
         />
 
         <Button

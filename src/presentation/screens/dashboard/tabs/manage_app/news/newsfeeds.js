@@ -32,7 +32,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: 386,
+    height: 300,
     width: "100%",
   },
   row: {
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     flexDirection: "column",
     margin: "auto",
-    minHeight: 256,
+    minHeight: 275,
     minWidth: 320,
     alignItems: "center",
   },
@@ -90,7 +90,6 @@ const NewsItemCard = (props) => {
   const {
     image,
     title,
-    subTitle,
     id,
     authorName,
     authorPhoto,
@@ -174,7 +173,6 @@ const NewsItemCard = (props) => {
             img={image}
             title={title}
             id={id}
-            subTitle={subTitle}
             authorName={authorName}
             authorPhoto={authorPhoto}
             body={body}
@@ -229,7 +227,6 @@ const NewsItemCard = (props) => {
               pathname: "/admin/dashboard/manage-app/news-feeds:" + item?.id,
               state: {
                 title: item?.title,
-                subTitle: item?.subTitle,
                 category: item?.category,
                 image: item?.image,
                 body: item?.body,
@@ -265,15 +262,6 @@ const NewsItemCard = (props) => {
           >
             {category}
           </Typography>
-          <Typography
-            justifyContent="stretch"
-            textAlign="left"
-            fontSize={14}
-            color="black"
-            padding={1}
-          >
-            {body?.length > 150 ? body?.substring(0, 150) + "..." : body}
-          </Typography>
         </CardActionArea>
       </Card>
     </>
@@ -291,7 +279,8 @@ const NewsFeeds = () => {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const news = [];
       querySnapshot.forEach((doc) => {
-        news.push(doc.data());
+        let dat = doc.data();
+        news?.push(dat);
       });
       setNewsList(news);
     });
@@ -341,11 +330,9 @@ const NewsFeeds = () => {
                   id={newsList[index]?.id}
                   image={newsList[index]?.image}
                   title={newsList[index]?.title}
-                  subTitle={newsList[index]?.subTitle}
                   authorName={newsList[index]?.authorName}
                   authorPhoto={newsList[index]?.authorPhoto}
                   body={newsList[index]?.body}
-                  // date={newsList[index]?.createdAt}
                   category={newsList[index]?.category}
                 />
               </Grid>

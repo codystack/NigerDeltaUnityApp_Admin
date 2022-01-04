@@ -18,6 +18,7 @@ import {
 } from "../../../../../../data/firebase";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
+import MUIRichTextEditor from "mui-rte";
 
 const useStyles = makeStyles((theme) => ({
   row: {
@@ -215,9 +216,12 @@ const NewsItem = (props) => {
       <br />
 
       <div className={classes.lhsRow}>
-        <Typography fontSize={15} variant="h6" textAlign="start">
-          {location?.state?.body}
-        </Typography>
+        <MUIRichTextEditor
+          readOnly
+          defaultValue={location?.state?.body}
+          inlineToolbar={false}
+          toolbar={false}
+        />
       </div>
       <br />
 

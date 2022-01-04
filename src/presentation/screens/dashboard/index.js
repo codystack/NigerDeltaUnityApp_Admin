@@ -38,6 +38,10 @@ import TermsOfService from "./tabs/manage_app/terms-of-service";
 import ContactUs from "./tabs/manage_app/contact-us";
 import VendorItem from "./tabs/manage_app/directories/vendor_detail";
 import ProductDetail from "./tabs/manage_app/directories/product_detail";
+import State from "./tabs/manage_app/states";
+import History from "./tabs/manage_app/history";
+import HistoryDetail from "./tabs/manage_app/history/history_detail";
+import Education from "./tabs/manage_app/education";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -160,25 +164,6 @@ function Dashboard(props) {
     setOpenNotiModal(false);
   };
 
-  // const renderMobileNotification = (
-  //   <div style={{ display: "flex", flexDirection: "column" }}>
-  //     <List>
-  //       {notifications?.map((item, index) => (
-  //         <ListItem
-  //           divider
-  //           button
-  //           key={index}
-  //           onClick={() => handleMenuClose(item)}
-  //           style={{ display: "flex", flexDirection: "column" }}
-  //         >
-  //           <Typography>{item?.Body}</Typography>
-  //           {/* <span style={{ fontSize: 12 }} > {item.date} </span> */}
-  //         </ListItem>
-  //       ))}
-  //     </List>
-  //   </div>
-  // );
-
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -205,19 +190,7 @@ function Dashboard(props) {
       transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
-    >
-      {/* <MenuItem
-        style={{ alignItems: "center" }}
-        onClick={openMobileNotificationModal}
-      >
-        <IconButton aria-label="show new notifications" color="inherit">
-          <Badge badgeContent={notifications?.length} color="error">
-            <NotificationsNoneIcon color="secondary" />
-          </Badge>
-        </IconButton>
-        <Typography style={{ marginLeft: 3 }}>Notifications</Typography>
-      </MenuItem> */}
-    </Menu>
+    ></Menu>
   );
 
   const container =
@@ -268,15 +241,7 @@ function Dashboard(props) {
                 <Typography
                   variant="body2"
                   style={{ margin: "auto", paddingRight: 3 }}
-                >
-                  {/* {resultTrail} */}
-                </Typography>
-                {/* <Avatar className={classes.avatar}
-                                    src={userData?.Display_Image !== ''
-                                        ? userData?.Display_Image : ''}>
-                                    {userData?.Display_Image !== ''
-                                        ? '' : initials}
-                                </Avatar> */}
+                ></Typography>
               </div>
             )}
             <IconButton
@@ -286,17 +251,7 @@ function Dashboard(props) {
               aria-controls={menuId}
               aria-haspopup="true"
               //onClick={handleNotificationMenuOpen}
-            >
-              {/* <Badge
-                badgeContent={notifications?.length}
-                color="error"
-                style={{ color: "red" }}
-              >
-                <NotificationsNoneIcon
-                  style={{ color: theme.palette.secondary.main }}
-                />
-              </Badge> */}
-            </IconButton>
+            ></IconButton>
             <IconButton
               edge="end"
               aria-label="account of current user"
@@ -380,12 +335,28 @@ function Dashboard(props) {
               <Projects />
             </Route>
 
+            <Route path="/admin/dashboard/manage-app/states" exact={true}>
+              <State />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/history" exact={true}>
+              <History />
+            </Route>
+
             <Route path="/admin/dashboard/manage-app/vendors" exact={true}>
               <Directories />
             </Route>
 
             <Route path="/admin/dashboard/manage-app/vendors:id" exact={true}>
               <VendorItem />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/history:id" exact={true}>
+              <HistoryDetail />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/education" exact={true}>
+              <Education />
             </Route>
 
             <Route
@@ -425,13 +396,6 @@ function Dashboard(props) {
             </Route>
           </Switch>
         </div>
-        {/* <div style={{
-                    flexDirection: 'column', marginTop: 'auto', justifyContent: 'flex-start',
-                    alignItems: 'center', paddingTop: 10, paddingBottom: 10, paddingLeft: theme.spacing(1),
-                    backgroundColor: theme.palette.background.paper, marginRight: 2, marginLeft: 2
-                }}>
-                    <FooterBottom />
-                </div> */}
       </main>
     </div>
   );

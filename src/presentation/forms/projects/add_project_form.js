@@ -13,6 +13,11 @@ import {
   storage,
   setDoc,
   doc,
+  query,
+  onSnapshot,
+  collection,
+  updateDoc,
+  arrayUnion,
   uploadBytesResumable,
   getDownloadURL,
 } from "../../../data/firebase";
@@ -21,9 +26,9 @@ import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress, Grid, MenuItem } from "@mui/material";
 import { Typography } from "@mui/material";
-
 import Dropzone from "react-dropzone";
-import FormHelperText from "@mui/material/FormHelperText";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -33,6 +38,12 @@ const useStyles = makeStyles((theme) => ({
   },
   mb: {
     marginBottom: 10,
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 }));
 
@@ -80,23 +91,30 @@ const AddProjectForm = (props) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
+  const [statesList, setStatesList] = React.useState(null);
+  const [stateId, setStateId] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
-  const [statesList, setStatesList] = React.useState([
-    "Akwa Ibom State",
-    "Bayelsa State",
-    "Cross River State",
-    "Delta State",
-    "Edo State",
-    "Rivers State",
-  ]);
+
   const [files, setFiles] = React.useState([]);
   const [fileNames, setFileNames] = React.useState([]);
-  const [fileError, setFileError] = React.useState("");
+  const [urls, setUrls] = React.useState([]);
+  // const [fileError, setFileError] = React.useState("");
 
   const handleDrop = (acceptedFiles) => {
     setFileNames(acceptedFiles.map((file) => file.name));
     setFiles(acceptedFiles);
   };
+
+  React.useEffect(() => {
+    const q = query(collection(db, "states"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const states = [];
+      querySnapshot.forEach((doc) => {
+        states.push(doc.data());
+      });
+      setStatesList(states);
+    });
+  }, []);
 
   const fileValidator = (file) => {
     if (!file || file?.length < 1) {
@@ -108,7 +126,7 @@ const AddProjectForm = (props) => {
     return null;
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { id, name, value } = e.target;
 
     if (id === "image") {
@@ -118,16 +136,75 @@ const AddProjectForm = (props) => {
         ...prevData,
         image: e.target.value,
       }));
+    } else if (name === "state") {
+      setFormValues((prevData) => ({ ...prevData, [name]: value }));
+      let item = await statesList?.find((item) => item?.name === value);
+      setStateId(item?.id);
     } else {
       setFormValues((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
+  const handleUpload = (tnw) => {
+    const promises = [];
+    files?.map((image) => {
+      let storageRef = ref(storage, `projects/${image.name}`);
+      let uploadTask = uploadBytesResumable(storageRef, files);
+      promises.push(uploadTask);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+        },
+        (error) => {
+          console.log(error);
+        },
+        async () => {
+          await getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setIsUploading(false);
+            setIsLoading(true);
+            setUrls(urls.push(downloadURL));
+          });
+        }
+      );
+    });
+
+    Promise.all(promises)
+      .then(async () => {
+        // Now update the images field
+        console.log("URLS", urls);
+        try {
+          const mRef = doc(db, "projects", "" + tnw);
+          await updateDoc(mRef, {
+            images: arrayUnion(...urls),
+          });
+
+          setOpen(false);
+          setIsLoading(false);
+          enqueueSnackbar(`New project added successfully`, {
+            variant: "success",
+          });
+        } catch (error) {
+          setIsLoading(false);
+          enqueueSnackbar(
+            `${error?.message || "Check your internet connection"}`,
+            {
+              variant: "error",
+            }
+          );
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
   const createProject = (e) => {
     setIsUploading(true);
-
     //First upload images to firebase storage then save to firestore
     const timeNow = new Date();
+
     let storageRef = ref(storage, "projects/" + timeNow.getTime());
     let uploadTask = uploadBytesResumable(storageRef, file);
     uploadTask.on(
@@ -143,34 +220,40 @@ const AddProjectForm = (props) => {
         enqueueSnackbar(`${error.message}`, { variant: "error" });
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setIsUploading(false);
-          setIsLoading(true);
-          setDoc(doc(db, "projects", `${timeNow.getTime()}`), {
-            id: timeNow.getTime(),
-            title: formValues.title,
-            image: downloadURL,
-            state: formValues.state,
-            description: formValues.desc,
-            createdAt: timeNow,
-            updatedAt: timeNow,
-          })
-            .then((res) => {
-              //Now upload author image
-              setOpen(false);
-              setIsLoading(false);
-              enqueueSnackbar(`New project added successfully`, {
-                variant: "success",
-              });
+        getDownloadURL(uploadTask.snapshot.ref)
+          .then((downloadURL) => {
+            setIsUploading(false);
+            setIsLoading(true);
+            setDoc(doc(db, "projects", `${timeNow.getTime()}`), {
+              id: timeNow.getTime(),
+              title: formValues.title,
+              image: downloadURL,
+              images: [],
+              state: formValues.state,
+              stateId: stateId,
+              description: formValues.desc,
+              createdAt: timeNow,
+              updatedAt: timeNow,
             })
-            .catch((error) => {
-              setIsUploading(false);
-              setIsLoading(false);
-              enqueueSnackbar(`${error?.message}`, {
-                variant: "error",
+              .then((res) => {
+                //Now upload project progress images here
+                handleUpload(timeNow.getTime());
+              })
+              .catch((error) => {
+                setIsUploading(false);
+                setIsLoading(false);
+                enqueueSnackbar(`${error?.message}`, {
+                  variant: "error",
+                });
               });
+          })
+          .catch((error) => {
+            setIsUploading(false);
+            setIsLoading(false);
+            enqueueSnackbar(`${error?.message}`, {
+              variant: "error",
             });
-        });
+          });
       }
     );
   };
@@ -201,7 +284,7 @@ const AddProjectForm = (props) => {
               type="file"
               fullWidth
               disabled={isLoading}
-              accept=".png, .jpg, .jpeg, .pdf"
+              accept=".png, .jpg, .jpeg"
               onChange={handleChange}
               validators={["required"]}
               errorMessages={["Featured image is required"]}
@@ -224,6 +307,7 @@ const AddProjectForm = (props) => {
         </Grid>
 
         <SelectValidator
+          id="state"
           className={classes.mb}
           value={formValues.state}
           onChange={handleChange}
@@ -236,8 +320,8 @@ const AddProjectForm = (props) => {
           errorMessages={["Project state is required"]}
         >
           {(statesList ?? [])?.map((item, index) => (
-            <MenuItem key={index} value={item ?? ""}>
-              {item ?? ""}
+            <MenuItem key={index} value={item?.name ?? ""}>
+              {item?.name ?? ""}
             </MenuItem>
           ))}
         </SelectValidator>
@@ -282,13 +366,27 @@ const AddProjectForm = (props) => {
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps({ className: classes.dropZone })}>
               <input {...getInputProps()} />
-              <p>Drag'n'drop files, or click to select files</p>
+              {files?.length > 0 ? (
+                <div className={classes.row}>
+                  <div>
+                    <List disablePadding>
+                      {fileNames.map((fileName) => (
+                        <ListItem disableGutters divider key={fileName}>
+                          {fileName}
+                        </ListItem>
+                      ))}
+                    </List>
+                  </div>
+                  <Typography padding={2} color="blue">
+                    Add more files
+                  </Typography>
+                </div>
+              ) : (
+                <p>Add project images, Maximum of 5 images</p>
+              )}
             </div>
           )}
         </Dropzone>
-        <FormHelperText style={{ color: "red" }}>
-          {files?.length < 1 ? fileError : null}
-        </FormHelperText>
 
         <Button
           type="submit"

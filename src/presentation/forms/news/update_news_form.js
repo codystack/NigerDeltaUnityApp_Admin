@@ -21,13 +21,13 @@ import {
   updateDoc,
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
-import { addCategory } from "../../../domain/service";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
+import RichText from "../../components/misc/richtext/";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -76,22 +76,20 @@ const EditNewsForm = (props) => {
     setOpen,
     id,
     title,
-    subTitle,
     img,
     category,
     body,
+    summary,
     authorName,
     authorPhoto,
   } = props;
   const [formValues, setFormValues] = React.useState({
-    title: " ",
+    title: title,
     image: "",
-    category: "",
-    subTitle: " ",
-    body: " ",
-    createdAt: "",
-    authorName: " ",
+    category: category,
+    authorName: authorName,
     authorPhoto: "",
+    summary: summary,
   });
   const [file, setFile] = React.useState(null);
   const [authorFile, setAuthorFile] = React.useState(null);
@@ -100,9 +98,12 @@ const EditNewsForm = (props) => {
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
   const [previewAuthor, setPreviewAuthor] = React.useState("");
-  const { enqueueSnackbar } = useSnackbar();
 
+  const [newsBody, setNewsBody] = React.useState(body);
+  const [isError, setIsError] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
   const [categoriesList, setCategoriesList] = React.useState(null);
+  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
@@ -164,10 +165,10 @@ const EditNewsForm = (props) => {
           try {
             await updateDoc(mRef, {
               title: formValues.title,
-              subTitle: formValues.subTitle,
               authorName: formValues.authorName,
               category: formValues.category,
-              body: formValues.body,
+              body: newsBody,
+              summary: formValues.summary,
               updatedAt: timeNow,
               image: downloadURL,
             });
@@ -214,10 +215,10 @@ const EditNewsForm = (props) => {
           try {
             await updateDoc(mRef, {
               title: formValues.title,
-              subTitle: formValues.subTitle,
               authorName: formValues.authorName,
               category: formValues.category,
-              body: formValues.body,
+              body: newsBody,
+              summary: formValues.summary,
               updatedAt: timeNow,
               authorPhoto: downloadURL,
             });
@@ -241,23 +242,22 @@ const EditNewsForm = (props) => {
     setIsLoading(true);
     setFormValues({
       title: formValues.title ? formValues.title : title,
-      subTitle: formValues.subTitle ? formValues.subTitle : subTitle,
       authorName: formValues.authorName ? formValues.authorName : authorName,
       category: formValues.category ? formValues.category : category,
-      body: formValues.body ? formValues.body : body,
+      body: newsBody,
+      summary: formValues.summary ? formValues.summary : summary,
     });
     if (!previewImage && !previewAuthor) {
       //No image is changed. So update all text
-      console.log("ID: ", id);
       const timeNow = new Date();
       try {
         const mRef = doc(db, "news", "" + id);
         await updateDoc(mRef, {
           title: formValues.title,
-          subTitle: formValues.subTitle,
           authorName: formValues.authorName,
           category: formValues.category,
-          body: formValues.body,
+          body: newsBody,
+          summary: formValues.summary,
           updatedAt: timeNow,
         });
         setOpen(false);
@@ -337,10 +337,10 @@ const EditNewsForm = (props) => {
                         const mRef = doc(db, "news", "" + id);
                         await updateDoc(mRef, {
                           title: formValues.title,
-                          subTitle: formValues.subTitle,
                           authorName: formValues.authorName,
                           category: formValues.category,
-                          body: formValues.body,
+                          body: newsBody,
+                          summary: formValues.summary,
                           updatedAt: timeNow,
                           image: downloadURL,
                         });
@@ -403,7 +403,6 @@ const EditNewsForm = (props) => {
         })
         .catch((error) => {
           setIsLoading(false);
-          console.log("ErR: ", error);
         });
     }
   };
@@ -434,7 +433,7 @@ const EditNewsForm = (props) => {
               type="file"
               fullWidth
               disabled={isLoading}
-              accept=".png, .jpg, .jpeg, .pdf"
+              accept=".png, .jpg, .jpeg"
               onChange={handleChange}
               helperText="Featured image"
             />
@@ -451,7 +450,6 @@ const EditNewsForm = (props) => {
             </div>
           </Grid>
         </Grid>
-
         <SelectValidator
           className={classes.mb}
           value={formValues.category ? formValues.category : category}
@@ -470,7 +468,6 @@ const EditNewsForm = (props) => {
             </MenuItem>
           ))}
         </SelectValidator>
-
         <TextValidator
           className={classes.mb}
           id="title"
@@ -490,47 +487,31 @@ const EditNewsForm = (props) => {
           validators={["required"]}
           errorMessages={["News title is required"]}
         />
-
+        <RichText
+          value={newsBody}
+          setValue={setNewsBody}
+          error={isError}
+          setError={setIsError}
+          setIsStartedFilling={setIsStartedFilling}
+        />
+        <br />
         <TextValidator
           className={classes.mb}
-          id="subTitle"
-          label="News subtitle (optional)"
+          id="summary"
+          multiLine
+          rows={2}
+          rowsMax={2}
+          label="News summary"
+          placeholder="Type summary here..."
           size="small"
           variant="outlined"
-          value={
-            formValues.subTitle === " "
-              ? subTitle
-              : !formValues.subTitle
-              ? ""
-              : formValues.subTitle
-          }
+          value={formValues.summary}
           onChange={handleChange}
-          name="subTitle"
+          name="summary"
           fullWidth
-        />
-
-        <TextValidator
-          className={classes.mb}
-          fullWidth
-          multiline
-          rows={5}
-          rowsMax={10}
-          placeholder="Type news here"
-          name="body"
-          label="News content"
-          value={
-            formValues.body === " "
-              ? body
-              : !formValues.body
-              ? ""
-              : formValues.body
-          }
-          onChange={handleChange}
-          variant="outlined"
           validators={["required"]}
-          errorMessages={["News content is required"]}
+          errorMessages={["News summary is required"]}
         />
-
         <Grid container spacing={1} padding={1} marginBottom={1}>
           <Grid item xs={12} sm={6} md={7}>
             <div>
@@ -577,7 +558,6 @@ const EditNewsForm = (props) => {
             </div>
           </Grid>
         </Grid>
-
         <Button
           type="submit"
           variant="contained"

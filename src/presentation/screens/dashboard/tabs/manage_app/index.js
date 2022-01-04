@@ -15,6 +15,9 @@ import adsImage from "../../../../../assets/images/ads_ndua_admin.jpeg";
 import privacyImage from "../../../../../assets/images/privacy.jpeg";
 import termsImage from "../../../../../assets/images/terms_of_service.jpeg";
 import contactUsImage from "../../../../../assets/images/handshake.jpeg";
+import stateImage from "../../../../../assets/images/state_logo.jpeg";
+import historyImage from "../../../../../assets/images/history_ndua_logo.jpeg";
+import educationImage from "../../../../../assets/images/education_logo.jpeg";
 
 import Grid from "@mui/material/Grid";
 import { useHistory } from "react-router-dom";
@@ -90,6 +93,24 @@ const ManageApp = () => {
       desc: "Manage app projects",
       to: "/admin/dashboard/manage-app/projects",
       image: projectsImage,
+    },
+    {
+      title: "States",
+      desc: "Manage states",
+      to: "/admin/dashboard/manage-app/states",
+      image: stateImage,
+    },
+    {
+      title: "History",
+      desc: "Manage history",
+      to: "/admin/dashboard/manage-app/history",
+      image: historyImage,
+    },
+    {
+      title: "Education",
+      desc: "Manage education",
+      to: "/admin/dashboard/manage-app/education",
+      image: educationImage,
     },
     {
       title: "Directories",

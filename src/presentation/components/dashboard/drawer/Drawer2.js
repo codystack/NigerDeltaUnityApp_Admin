@@ -14,7 +14,7 @@ import { withRouter } from "react-router-dom";
 import { makeStyles, useTheme } from "@mui/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
-import logo from "../../../../assets/images/icon_blue.png";
+import logo from "../../../../assets/images/logo_white.png";
 
 import { useSnackbar } from "notistack";
 import Skeleton from "@mui/material/Skeleton";
@@ -22,6 +22,8 @@ import Skeleton from "@mui/material/Skeleton";
 import { auth } from "../../../../data/firebase";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../../../data/store/slice/user";
+
+import pattern from "../../../../assets/images/pattern.png";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -34,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    backgroundColor: "#0C0C77",
   },
   toolbar: theme.mixins.toolbar,
   listRoot: {
@@ -59,7 +62,7 @@ const Drawer2 = (props) => {
       icon: (
         <DashBoardIcon
           style={
-            selectedIndex === 0 ? { color: "#4C3992" } : { color: "black" }
+            selectedIndex === 0 ? { color: "white" } : { color: "#4C3992" }
           }
         />
       ),
@@ -70,7 +73,7 @@ const Drawer2 = (props) => {
       icon: (
         <SchoolOutlinedIcon
           style={
-            selectedIndex === 1 ? { color: "#4C3992" } : { color: "black" }
+            selectedIndex === 1 ? { color: "white" } : { color: "#4C3992" }
           }
         />
       ),
@@ -81,7 +84,7 @@ const Drawer2 = (props) => {
       icon: (
         <PeopleOutlinedIcon
           style={
-            selectedIndex === 2 ? { color: "#4C3992" } : { color: "black" }
+            selectedIndex === 2 ? { color: "white" } : { color: "#4C3992" }
           }
         />
       ),
@@ -92,7 +95,7 @@ const Drawer2 = (props) => {
       icon: (
         <PersonOutlineIcon
           style={
-            selectedIndex === 3 ? { color: "#4C3992" } : { color: "black" }
+            selectedIndex === 3 ? { color: "white" } : { color: "#4C3992" }
           }
         />
       ),
@@ -150,8 +153,14 @@ const Drawer2 = (props) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        backgroundImage: "url(" + pattern + ")",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        zIndex: 100,
       }}
     >
+      <br />
       <div
         className={classes.toolbar}
         style={{
@@ -173,6 +182,7 @@ const Drawer2 = (props) => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          color: "white",
         }}
       >
         <List className={classes.listRoot}>
@@ -214,11 +224,14 @@ const Drawer2 = (props) => {
           justifyContent: "left",
           alignItems: "start",
           padding: 16,
+          zIndex: 1000,
         }}
       >
         <Button
+          variant="text"
+          color="secondary"
           startIcon={<PowerSettingsNewIcon />}
-          style={{ textTransform: "none" }}
+          style={{ textTransform: "none", zIndex: 1000 }}
           onClick={signOut}
         >
           Sign Out

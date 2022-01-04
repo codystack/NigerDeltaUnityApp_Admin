@@ -12,6 +12,9 @@ import {
   ref,
   storage,
   doc,
+  query,
+  collection,
+  onSnapshot,
   uploadBytesResumable,
   getDownloadURL,
   deleteObject,
@@ -24,6 +27,7 @@ import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
+import { FirebaseError } from "@firebase/util";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -70,39 +74,33 @@ const EditProjectForm = (props) => {
   const classes = useStyles();
   let { setOpen, id, title, img, state, desc } = props;
   const [formValues, setFormValues] = React.useState({
-    title: " ",
+    title: title,
     image: "",
-    state: " ",
-    desc: " ",
+    state: state,
+    desc: desc,
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
+  const [statesList, setStatesList] = React.useState(null);
+  const [stateId, setStateId] = React.useState(0);
+
   const { enqueueSnackbar } = useSnackbar();
 
-  const [statesList, setStatesList] = React.useState([
-    "Akwa Ibom State",
-    "Bayelsa State",
-    "Cross River State",
-    "Delta State",
-    "Edo State",
-    "Rivers State",
-  ]);
+  React.useEffect(() => {
+    const q = query(collection(db, "states"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const states = [];
+      querySnapshot.forEach((doc) => {
+        states.push(doc.data());
+      });
+      setStatesList(states);
+    });
+  }, []);
 
-  //   React.useEffect(() => {
-  //     const q = query(collection(db, "categories"));
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       const categories = [];
-  //       querySnapshot.forEach((doc) => {
-  //         categories.push(doc.data());
-  //       });
-  //       setCategoriesList(categories);
-  //     });
-  //   }, []);
-
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { id, name, value } = e.target;
 
     if (id === "image") {
@@ -112,6 +110,10 @@ const EditProjectForm = (props) => {
         ...prevData,
         image: e.target.value,
       }));
+    } else if (name === "state") {
+      setFormValues((prevData) => ({ ...prevData, [name]: value }));
+      let item = await statesList?.find((item) => item?.name === value);
+      setStateId(item?.id);
     } else {
       setFormValues((prevData) => ({ ...prevData, [name]: value }));
     }
@@ -121,7 +123,7 @@ const EditProjectForm = (props) => {
     setIsUploading(true);
     const timeNow = new Date();
     //First upload image to firebase storage then save to firestore
-    const storageRef = ref(storage, "news/" + timeNow.getTime());
+    const storageRef = ref(storage, "projects/" + timeNow.getTime());
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -140,27 +142,29 @@ const EditProjectForm = (props) => {
         setIsUploading(false);
         setIsLoading(true);
         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          const mRef = doc(db, "news", "" + id);
+          const mRef = doc(db, "projects", "" + id);
           try {
             await updateDoc(mRef, {
               title: formValues.title,
-              subTitle: formValues.subTitle,
-              authorName: formValues.authorName,
-              category: formValues.category,
-              body: formValues.body,
+              state: formValues.state,
+              stateId: stateId,
+              description: formValues.desc,
               updatedAt: timeNow,
               image: downloadURL,
             });
             setOpen(false);
             setIsLoading(false);
-            enqueueSnackbar(`Newsfeed updated successfully`, {
+            enqueueSnackbar(`Project updated successfully`, {
               variant: "success",
             });
           } catch (error) {
             setIsLoading(false);
-            enqueueSnackbar(`${error?.message}`, {
-              variant: "error",
-            });
+            enqueueSnackbar(
+              `${error?.message || "Check your internet connection"}`,
+              {
+                variant: "error",
+              }
+            );
           }
         });
       }
@@ -169,6 +173,7 @@ const EditProjectForm = (props) => {
 
   const updateProject = async (e) => {
     setIsLoading(true);
+
     setFormValues({
       title: formValues.title ? formValues.title : title,
       state: formValues.state ? formValues.state : state,
@@ -185,64 +190,41 @@ const EditProjectForm = (props) => {
         })
         .catch((error) => {
           setIsLoading(false);
-          console.log("ErR: ", error);
-        });
-    } else {
-      const fileRef = ref(storage, "projects/" + id);
-
-      setIsLoading(true);
-
-      deleteObject(fileRef)
-        .then(() => {
-          const timeNow = new Date();
-          let storageRef = ref(storage, "projects/" + timeNow.getTime());
-          let uploadTask = uploadBytesResumable(storageRef, file);
-
-          setIsLoading(false);
-          setIsUploading(true);
-
-          uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-              const uprogress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setProgress(uprogress);
-            },
-            (error) => {
-              setIsUploading(false);
-              console.log(error);
-              enqueueSnackbar(`${error?.message}`, { variant: "error" });
-            },
-            () => {
-              setIsUploading(false);
-              setIsLoading(true);
-              getDownloadURL(uploadTask?.snapshot?.ref).then(
-                async (downloadURL) => {
-                  try {
-                    const mRef = doc(db, "projects", "" + id);
-                    await updateDoc(mRef, {
-                      title: formValues.title,
-                      state: formValues.state,
-                      description: formValues.desc,
-                      updatedAt: timeNow,
-                      image: downloadURL,
-                    });
-                    setOpen(false);
-                    setIsLoading(false);
-                    enqueueSnackbar(`Project updated successfully`, {
-                      variant: "success",
-                    });
-                  } catch (error) {}
-                }
-              );
+          enqueueSnackbar(
+            `${error?.message || "Check your internet connection"}`,
+            {
+              variant: "error",
             }
           );
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          setIsUploading(false);
-          console.log("ErR: ", error);
         });
+    } else {
+      // const fileRef = ref(storage, "projects/" + id);
+      const timeNow = new Date();
+      setIsLoading(true);
+      try {
+        const mRef = doc(db, "projects", "" + id);
+        await updateDoc(mRef, {
+          title: formValues.title,
+          state: formValues.state,
+          stateId: stateId,
+          description: formValues.desc,
+          updatedAt: timeNow,
+        });
+        setOpen(false);
+        setIsLoading(false);
+        enqueueSnackbar(`Project updated successfully`, {
+          variant: "success",
+        });
+      } catch (error) {
+        setIsLoading(false);
+        setIsUploading(false);
+        enqueueSnackbar(
+          `${error?.message || "Check your internet connection"}`,
+          {
+            variant: "error",
+          }
+        );
+      }
     }
   };
 
@@ -291,6 +273,7 @@ const EditProjectForm = (props) => {
         </Grid>
 
         <SelectValidator
+          id="state"
           className={classes.mb}
           value={formValues.state ? formValues.state : state}
           onChange={handleChange}
@@ -303,8 +286,8 @@ const EditProjectForm = (props) => {
           errorMessages={["Project state is required"]}
         >
           {(statesList ?? [])?.map((item, index) => (
-            <MenuItem key={index} value={item ?? ""}>
-              {item ?? ""}
+            <MenuItem key={index} value={item?.name ?? ""}>
+              {item?.name ?? ""}
             </MenuItem>
           ))}
         </SelectValidator>

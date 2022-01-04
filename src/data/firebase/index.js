@@ -19,6 +19,7 @@ import {
   onSnapshot,
   updateDoc,
   deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -65,6 +66,7 @@ export {
   onSnapshot,
   uploadBytes,
   deleteObject,
+  arrayUnion,
   setPersistence,
   getDownloadURL,
   uploadBytesResumable,

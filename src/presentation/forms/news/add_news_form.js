@@ -25,6 +25,7 @@ import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress, Grid, MenuItem } from "@mui/material";
 import { Typography } from "@mui/material";
+import RichText from "../../components/misc/richtext";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -74,8 +75,8 @@ const AddNewsForm = (props) => {
     title: "",
     image: "",
     category: "",
-    subTitle: " ",
     body: "",
+    summary: "",
     createdAt: "",
     authorName: "",
     authorPhoto: "",
@@ -87,7 +88,10 @@ const AddNewsForm = (props) => {
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
   const [previewAuthor, setPreviewAuthor] = React.useState("");
+  const [newsBody, setNewsBody] = React.useState(null);
+  const [isError, setIsError] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
   const [categoriesList, setCategoriesList] = React.useState(null);
 
   React.useEffect(() => {
@@ -153,10 +157,10 @@ const AddNewsForm = (props) => {
             title: formValues.title,
             image: downloadURL,
             category: formValues.category,
-            subTitle: formValues.subTitle,
             authorName: formValues.authorName,
             authorPhoto: " ",
-            body: formValues.body,
+            body: newsBody,
+            summary: formValues.summary,
             createdAt: timeNow,
             updatedAt: timeNow,
           })
@@ -174,7 +178,6 @@ const AddNewsForm = (props) => {
                 },
                 (error) => {
                   setIsUploading(false);
-                  console.log(error);
                   enqueueSnackbar(`${error.message}`, { variant: "error" });
                 },
                 () => {
@@ -237,7 +240,7 @@ const AddNewsForm = (props) => {
               type="file"
               fullWidth
               disabled={isLoading}
-              accept=".png, .jpg, .jpeg, .pdf"
+              accept=".png, .jpg, .jpeg"
               onChange={handleChange}
               validators={["required"]}
               errorMessages={["Featured image is required"]}
@@ -259,65 +262,69 @@ const AddNewsForm = (props) => {
           </Grid>
         </Grid>
 
-        <SelectValidator
-          className={classes.mb}
-          value={formValues.category}
-          onChange={handleChange}
-          label="News category"
-          name="category"
-          fullWidth
-          variant="outlined"
-          size="small"
-          validators={["required"]}
-          errorMessages={["News category is required"]}
-        >
-          {(categoriesList ?? [])?.map((item, index) => (
-            <MenuItem key={index} value={item?.title ?? ""}>
-              {item?.title ?? ""}
-            </MenuItem>
-          ))}
-        </SelectValidator>
+        <Grid container spacing={1} padding={1}>
+          <Grid item xs={12} sm={6} md={7}>
+            <TextValidator
+              className={classes.mb}
+              id="title"
+              label="News title"
+              size="small"
+              variant="outlined"
+              value={formValues.title}
+              onChange={handleChange}
+              name="title"
+              fullWidth
+              validators={["required"]}
+              errorMessages={["News title is required"]}
+            />
+          </Grid>
 
-        <TextValidator
-          className={classes.mb}
-          id="title"
-          label="News title"
-          size="small"
-          variant="outlined"
-          value={formValues.title}
-          onChange={handleChange}
-          name="title"
-          fullWidth
-          validators={["required"]}
-          errorMessages={["News title is required"]}
+          <Grid item xs={12} sm={6} md={5}>
+            <SelectValidator
+              className={classes.mb}
+              value={formValues.category}
+              onChange={handleChange}
+              label="News category"
+              name="category"
+              fullWidth
+              variant="outlined"
+              size="small"
+              validators={["required"]}
+              errorMessages={["News category is required"]}
+            >
+              {(categoriesList ?? [])?.map((item, index) => (
+                <MenuItem key={index} value={item?.title ?? ""}>
+                  {item?.title ?? ""}
+                </MenuItem>
+              ))}
+            </SelectValidator>
+          </Grid>
+        </Grid>
+
+        <RichText
+          value={newsBody}
+          setValue={setNewsBody}
+          error={isError}
+          setError={setIsError}
+          setIsStartedFilling={setIsStartedFilling}
         />
-
+        <br />
         <TextValidator
           className={classes.mb}
-          id="subTitle"
-          label="News subtitle (optional)"
+          id="summary"
+          multiLine
+          rows={2}
+          rowsMax={2}
+          label="News summary"
+          placeholder="Type summary here..."
           size="small"
           variant="outlined"
-          value={formValues.subTitle}
+          value={formValues.summary}
           onChange={handleChange}
-          name="subTitle"
+          name="summary"
           fullWidth
-        />
-
-        <TextValidator
-          className={classes.mb}
-          fullWidth
-          multiline
-          rows={5}
-          rowsMax={10}
-          placeholder="Type news here"
-          name="body"
-          label="News content"
-          value={formValues.body}
-          onChange={handleChange}
-          variant="outlined"
           validators={["required"]}
-          errorMessages={["News content is required"]}
+          errorMessages={["News summary is required"]}
         />
 
         <Grid container spacing={1} padding={1} marginBottom={1}>
