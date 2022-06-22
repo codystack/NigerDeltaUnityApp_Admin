@@ -1,12 +1,11 @@
 import React from "react";
-import { Avatar, Button, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { IconButton } from "@mui/material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
 import { useSnackbar } from "notistack";
 import {
   deleteDoc,
@@ -69,36 +68,30 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProjectItem = (props) => {
-  const { history, location } = props;
+  const { history, location, id } = props;
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const deleteNews = () => {
+  const deleteProject = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "news/" + location?.state?.id);
-    const fileRef2 = ref(storage, "news/img_" + location?.state?.id);
+    const fileRef = ref(storage, "projects/" + id);
 
     deleteObject(fileRef)
-      .then(() => {
-        deleteObject(fileRef2)
-          .then(async () => {
-            // Images deleted now delete from firestore,
-            try {
-              await deleteDoc(doc(db, "news", "" + location?.state?.id));
-              enqueueSnackbar(`Item deleted successfully`, {
-                variant: "success",
-              });
-            } catch (error) {
-              console.log("ERR: Del: ", error);
-              enqueueSnackbar(`Item not deleted. Try again`, {
-                variant: "error",
-              });
-            }
-          })
-          .catch((err) => {});
+      .then(async () => {
+        try {
+          await deleteDoc(doc(db, "projects", "" + id));
+          enqueueSnackbar(`Item deleted successfully`, {
+            variant: "success",
+          });
+        } catch (error) {
+          console.log("ERR: Del: ", error);
+          enqueueSnackbar(`Item not deleted. Try again`, {
+            variant: "error",
+          });
+        }
       })
       .catch((error) => {
         console.log("ErR: ", error);
@@ -125,7 +118,7 @@ const ProjectItem = (props) => {
           size="small"
           variant="contained"
           color="error"
-          onClick={deleteNews}
+          onClick={deleteProject}
         >
           Delete
         </Button>

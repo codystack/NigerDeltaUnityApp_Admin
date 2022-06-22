@@ -29,6 +29,9 @@ import { Typography } from "@mui/material";
 import Dropzone from "react-dropzone";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+// import RichText from "../../components/misc/richtext";
+// import { FormatColorResetRounded } from "@mui/icons-material";
+import QuillEditor from "../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -98,8 +101,9 @@ const AddProjectForm = (props) => {
   const [files, setFiles] = React.useState([]);
   const [fileNames, setFileNames] = React.useState([]);
   const [urls, setUrls] = React.useState([]);
-  // const [fileError, setFileError] = React.useState("");
-
+  const [body, setBody] = React.useState(null);
+  // const [isError, setIsError] = React.useState(false);
+  // const [isStartedFilling, setIsStartedFilling] = React.useState(false);
   const handleDrop = (acceptedFiles) => {
     setFileNames(acceptedFiles.map((file) => file.name));
     setFiles(acceptedFiles);
@@ -107,7 +111,7 @@ const AddProjectForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "states"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const states = [];
       querySnapshot.forEach((doc) => {
         states.push(doc.data());
@@ -148,7 +152,7 @@ const AddProjectForm = (props) => {
   const handleUpload = (tnw) => {
     const promises = [];
     files?.map((image) => {
-      let storageRef = ref(storage, `projects/${image.name}`);
+      let storageRef = ref(storage, `projects/${image?.name}`);
       let uploadTask = uploadBytesResumable(storageRef, files);
       promises.push(uploadTask);
       uploadTask.on(
@@ -231,7 +235,7 @@ const AddProjectForm = (props) => {
               images: [],
               state: formValues.state,
               stateId: stateId,
-              description: formValues.desc,
+              description: body,
               createdAt: timeNow,
               updatedAt: timeNow,
             })
@@ -340,7 +344,18 @@ const AddProjectForm = (props) => {
           errorMessages={["Project title is required"]}
         />
 
-        <TextValidator
+        {/* <RichText
+          value={body}
+          setValue={setBody}
+          error={isError}
+          label="Type description here"
+          setError={setIsError}
+          setIsStartedFilling={setIsStartedFilling}
+        /> */}
+
+        <QuillEditor setValue={setBody} placeholder={"Type description here"} />
+
+        {/* <TextValidator
           className={classes.mb}
           fullWidth
           multiline
@@ -354,7 +369,7 @@ const AddProjectForm = (props) => {
           variant="outlined"
           validators={["required"]}
           errorMessages={["Project description is required"]}
-        />
+        /> */}
 
         <Dropzone
           onDrop={handleDrop}

@@ -23,9 +23,11 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress, Grid, MenuItem } from "@mui/material";
+import { CircularProgress, Grid, MenuItem, TextField } from "@mui/material";
 import { Typography } from "@mui/material";
-import RichText from "../../components/misc/richtext";
+import QuillEditor from "../../components/misc/richtext/quill";
+import { useHistory } from "react-router-dom";
+import { ArrowBackIosNew } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -70,7 +72,8 @@ const CircularProgressWithLabel = (props) => {
 
 const AddNewsForm = (props) => {
   const classes = useStyles();
-  let { setOpen } = props;
+  const history = useHistory();
+  // let { setOpen } = props;
   const [formValues, setFormValues] = React.useState({
     title: "",
     image: "",
@@ -89,14 +92,14 @@ const AddNewsForm = (props) => {
   const [previewImage, setPreviewImage] = React.useState("");
   const [previewAuthor, setPreviewAuthor] = React.useState("");
   const [newsBody, setNewsBody] = React.useState(null);
-  const [isError, setIsError] = React.useState(false);
+  // const [isError, setIsError] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
+  // const [isStartedFilling, setIsStartedFilling] = React.useState(false);
   const [categoriesList, setCategoriesList] = React.useState(null);
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -190,7 +193,8 @@ const AddNewsForm = (props) => {
                         await updateDoc(mRef, {
                           authorPhoto: download,
                         });
-                        setOpen(false);
+                        // setOpen(false);
+                        history.goBack();
                         setIsLoading(false);
                         enqueueSnackbar(`News item added successfully`, {
                           variant: "success",
@@ -229,6 +233,25 @@ const AddNewsForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={createNews}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            variant="contained"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Create News
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator
@@ -301,20 +324,20 @@ const AddNewsForm = (props) => {
           </Grid>
         </Grid>
 
-        <RichText
+        {/* <RichText
           value={newsBody}
           setValue={setNewsBody}
           error={isError}
           setError={setIsError}
           setIsStartedFilling={setIsStartedFilling}
-        />
+        /> */}
+        <QuillEditor setValue={setNewsBody} placeholder={"Type news here..."} />
         <br />
-        <TextValidator
+        <TextField
           className={classes.mb}
           id="summary"
           multiLine
-          rows={2}
-          rowsMax={2}
+          minRows={2}
           label="News summary"
           placeholder="Type summary here..."
           size="small"
@@ -323,8 +346,7 @@ const AddNewsForm = (props) => {
           onChange={handleChange}
           name="summary"
           fullWidth
-          validators={["required"]}
-          errorMessages={["News summary is required"]}
+          required
         />
 
         <Grid container spacing={1} padding={1} marginBottom={1}>

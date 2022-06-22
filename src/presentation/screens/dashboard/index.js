@@ -42,6 +42,8 @@ import State from "./tabs/manage_app/states";
 import History from "./tabs/manage_app/history";
 import HistoryDetail from "./tabs/manage_app/history/history_detail";
 import Education from "./tabs/manage_app/education";
+import AddVendorForm from "../../forms/directories/add_vendor";
+import AddNewsForm from "../../forms/news/add_news_form";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -331,6 +333,13 @@ function Dashboard(props) {
               <NewsFeeds />
             </Route>
 
+            <Route
+              path="/admin/dashboard/manage-app/news-feeds/create"
+              exact={true}
+            >
+              <AddNewsForm />
+            </Route>
+
             <Route path="/admin/dashboard/manage-app/projects" exact={true}>
               <Projects />
             </Route>
@@ -345,6 +354,13 @@ function Dashboard(props) {
 
             <Route path="/admin/dashboard/manage-app/vendors" exact={true}>
               <Directories />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/vendors/add-new"
+              exact={true}
+            >
+              <AddVendorForm />
             </Route>
 
             <Route path="/admin/dashboard/manage-app/vendors:id" exact={true}>

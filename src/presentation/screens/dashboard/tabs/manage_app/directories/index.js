@@ -116,8 +116,8 @@ const VendorItemCard = (props) => {
 
   const deleteVendor = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "news/" + id);
-    const fileRef2 = ref(storage, "news/img_" + id);
+    const fileRef = ref(storage, "vendor/" + id);
+    const fileRef2 = ref(storage, "vendor/img_" + id);
 
     deleteObject(fileRef)
       .then(() => {
@@ -404,7 +404,7 @@ const Directories = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "directories-categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -415,7 +415,7 @@ const Directories = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "directories-vendors"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const vendors = [];
       querySnapshot.forEach((doc) => {
         vendors.push(doc.data());
@@ -456,7 +456,10 @@ const Directories = () => {
           color="primary"
           variant="contained"
           disabled={vendorCategories?.length < 1}
-          onClick={() => setOpen(true)}
+          // Start vendor page here...
+          onClick={() =>
+            history.push("/admin/dashboard/manage-app/vendors/add-new")
+          }
         >
           Vendor
         </Button>

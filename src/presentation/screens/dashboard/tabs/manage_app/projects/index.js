@@ -31,7 +31,7 @@ import AddProjectForm from "../../../../../forms/projects/add_project_form";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: 360,
+    height: 320,
     width: "100%",
   },
   row: {
@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProjectsItemCard = (props) => {
-  const { image, title, id, createdAt, state, item, updatedAt, desc } = props;
+  const { image, title, id, state, item, updatedAt, desc } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
@@ -216,6 +216,7 @@ const ProjectsItemCard = (props) => {
         >
           <CardMedia image={image} className={classes.cardMedia} />
           <Divider />
+          <br />
           <div className={classes.row}>
             <Typography
               fontSize={16}
@@ -228,15 +229,6 @@ const ProjectsItemCard = (props) => {
             </Typography>
           </div>
 
-          <Typography
-            justifyContent="stretch"
-            textAlign="left"
-            fontSize={14}
-            color="black"
-            padding={1}
-          >
-            {desc?.length > 100 ? desc?.substring(0, 100) + "..." : desc}
-          </Typography>
           <div className={classes.subRow}>
             <Button variant="text" size="small">
               View

@@ -2,12 +2,10 @@ import "./App.css";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import Login from "./presentation/screens/login";
-import Signup from "./presentation/screens/register";
 import Dashboard from "./presentation/screens/dashboard";
 import {
   PrivateRouteDashboard,
   PrivateRouteLogin,
-  PrivateRouteSignup,
 } from "./domain/helper/private-routes";
 import React from "react";
 import { auth } from "./data/firebase";
@@ -43,7 +41,7 @@ function App() {
       // console.log(err);
     }
     // return () => {};
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="App">

@@ -77,7 +77,7 @@ const CategoryItem = (props) => {
       .then(async () => {
         // File deleted now delete from firestore,
         try {
-          await deleteDoc(doc(db, "categories", "img_" + id));
+          await deleteDoc(doc(db, "categories", "" + id));
           setOpenDelete(false);
           enqueueSnackbar(`Item deleted successfully`, { variant: "success" });
         } catch (error) {

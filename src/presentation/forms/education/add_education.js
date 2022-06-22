@@ -4,7 +4,7 @@ import {
   TextValidator,
   SelectValidator,
 } from "react-material-ui-form-validator";
-import Avatar from "@mui/material/Avatar";
+// import Avatar from "@mui/material/Avatar";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import {
@@ -17,16 +17,14 @@ import {
   getDownloadURL,
   query,
   collection,
-  updateDoc,
   onSnapshot,
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { Checkbox, CircularProgress, Grid, MenuItem } from "@mui/material";
+import { CircularProgress, Grid, MenuItem } from "@mui/material";
 import { Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { CameraAlt } from "@mui/icons-material";
 import placeholder from "../../../assets/images/placeholder.png";
 
 const useStyles = makeStyles((theme) => ({

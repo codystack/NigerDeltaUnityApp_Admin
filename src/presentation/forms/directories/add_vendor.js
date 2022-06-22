@@ -23,17 +23,12 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import {
-  Checkbox,
-  CircularProgress,
-  Grid,
-  IconButton,
-  MenuItem,
-} from "@mui/material";
+import { Checkbox, CircularProgress, Grid, MenuItem } from "@mui/material";
 import { Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import { CameraAlt } from "@mui/icons-material";
+import { ArrowBackIosNew, CameraAlt } from "@mui/icons-material";
 import placeholder from "../../../assets/images/placeholder.png";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -120,7 +115,7 @@ const CircularProgressWithLabel = (props) => {
 
 const AddVendorForm = (props) => {
   const classes = useStyles();
-  let { setOpen } = props;
+  let history = useHistory();
   const [formValues, setFormValues] = React.useState({
     name: "",
     image: "",
@@ -148,7 +143,7 @@ const AddVendorForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "directories-categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -220,6 +215,7 @@ const AddVendorForm = (props) => {
             blocked: false,
             createdAt: timeNow,
             updatedAt: timeNow,
+            listings: [],
           })
             .then((res) => {
               //Now upload author image
@@ -248,11 +244,12 @@ const AddVendorForm = (props) => {
                         await updateDoc(mRef, {
                           logo: download,
                         });
-                        setOpen(false);
+                        // setOpen(false);
                         setIsLoading(false);
                         enqueueSnackbar(`New vendor added successfully`, {
                           variant: "success",
                         });
+                        history.goBack();
                       } catch (error) {
                         setIsLoading(false);
                         enqueueSnackbar(`${error?.message}`, {
@@ -287,6 +284,21 @@ const AddVendorForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={createVendor}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection={"row"}
+          justifyContent="start"
+          alignItems={"start"}
+          paddingY={2}
+        >
+          <Button
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+        </Box>
         <TextValidator
           ref={coverRef}
           id="image"
@@ -329,7 +341,7 @@ const AddVendorForm = (props) => {
             display: "flex",
             flexDirection: "column",
             height: 144,
-            width: 420,
+            width: "100%",
             backgroundImage: "url(" + previewImage + ")",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",

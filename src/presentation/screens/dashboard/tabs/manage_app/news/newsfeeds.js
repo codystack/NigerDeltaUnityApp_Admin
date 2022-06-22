@@ -24,7 +24,7 @@ import {
   deleteDoc,
 } from "../../../../../../data/firebase";
 import { useSnackbar } from "notistack";
-import AddNewsForm from "../../../../../forms/news/add_news_form";
+// import AddNewsForm from "../../../../../forms/news/add_news_form";
 import Avatar from "@mui/material/Avatar";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
@@ -271,12 +271,12 @@ const NewsItemCard = (props) => {
 const NewsFeeds = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [open, setOpen] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
   const [newsList, setNewsList] = React.useState(null);
 
   React.useEffect(() => {
     const q = query(collection(db, "news"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const news = [];
       querySnapshot.forEach((doc) => {
         let dat = doc.data();
@@ -288,12 +288,12 @@ const NewsFeeds = () => {
 
   return (
     <div>
-      <CustomDialog
+      {/* <CustomDialog
         open={open}
         title="Create NewsFeed"
         handleClose={() => setOpen(false)}
         bodyComponent={<AddNewsForm setOpen={setOpen} />}
-      />
+      /> */}
       <div className={classes.row}>
         <div className={classes.lhsRow}>
           <Button
@@ -310,7 +310,9 @@ const NewsFeeds = () => {
           startIcon={<Add />}
           color="primary"
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={() =>
+            history.push("/admin/dashboard/manage-app/news-feeds/create")
+          }
         >
           Add News
         </Button>

@@ -18,7 +18,11 @@ import {
 } from "../../../../../../data/firebase";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
-import MUIRichTextEditor from "mui-rte";
+import ReactQuill from "react-quill"; // ES6
+
+// import MUIRichTextEditor from "mui-rte";
+// import parse from "html-react-parser";
+// import QuillEditor from "../../../../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
   row: {
@@ -133,6 +137,10 @@ const NewsItem = (props) => {
     </div>
   );
 
+  let modules = {
+    toolbar: null,
+  };
+
   return (
     <>
       <CustomDialog
@@ -216,12 +224,18 @@ const NewsItem = (props) => {
       <br />
 
       <div className={classes.lhsRow}>
-        <MUIRichTextEditor
+        {}
+        <ReactQuill
+          value={location?.state?.body}
+          readOnly={true}
+          modules={modules}
+        />
+        {/* <MUIRichTextEditor
           readOnly
           defaultValue={location?.state?.body}
           inlineToolbar={false}
           toolbar={false}
-        />
+        /> */}
       </div>
       <br />
 
