@@ -17,6 +17,7 @@ import {
 } from "../../../../../../data/firebase";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
+import ReactQuill from "react-quill"; // ES6
 import EditProjectForm from "../../../../../forms/projects/update_project_form";
 
 const useStyles = makeStyles((theme) => ({
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProjectItem = (props) => {
-  const { history, location, id } = props;
+  const { history, location } = props;
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
@@ -77,12 +78,12 @@ const ProjectItem = (props) => {
 
   const deleteProject = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "projects/" + id);
+    const fileRef = ref(storage, "projects/" + location?.state?.id);
 
     deleteObject(fileRef)
       .then(async () => {
         try {
-          await deleteDoc(doc(db, "projects", "" + id));
+          await deleteDoc(doc(db, "projects", "" + location?.state?.id));
           enqueueSnackbar(`Item deleted successfully`, {
             variant: "success",
           });
@@ -126,6 +127,10 @@ const ProjectItem = (props) => {
     </div>
   );
 
+  let modules = {
+    toolbar: null,
+  };
+
   return (
     <>
       <CustomDialog
@@ -134,7 +139,6 @@ const ProjectItem = (props) => {
         handleClose={() => setOpen(false)}
         bodyComponent={
           <EditProjectForm
-            setOpen={setOpen}
             img={location?.state?.image}
             title={location?.state?.title}
             id={location?.state?.id}
@@ -171,9 +175,20 @@ const ProjectItem = (props) => {
 
         <div className={classes.lhsRow}>
           <IconButton
-            aria-label="delete"
+            aria-label="edit"
             color="primary"
-            onClick={() => setOpen(true)}
+            onClick={() =>
+              history.push({
+                pathname: "/admin/dashboard/manage-app/projects/update",
+                state: {
+                  img: location?.state?.image,
+                  title: location?.state?.title,
+                  id: location?.state?.id,
+                  state: location?.state?.state,
+                  desc: location?.state?.desc,
+                },
+              })
+            }
           >
             <Edit />
           </IconButton>
@@ -192,8 +207,8 @@ const ProjectItem = (props) => {
         <img
           src={location?.state?.image}
           alt="featured_image"
-          width="100%"
-          height={400}
+          width="50%"
+          // height={400}
         />
       </div>
       <br />
@@ -209,9 +224,11 @@ const ProjectItem = (props) => {
       <br />
 
       <div className={classes.lhsRow}>
-        <Typography fontSize={15} variant="h6" textAlign="start">
-          {location?.state?.desc}
-        </Typography>
+        <ReactQuill
+          value={location?.state?.desc}
+          readOnly={true}
+          modules={modules}
+        />
       </div>
       <br />
     </>

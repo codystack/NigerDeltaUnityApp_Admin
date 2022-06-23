@@ -18,7 +18,6 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
-import { useSnackbar } from "notistack";
 
 import SearchIcon from "@mui/icons-material/Search";
 import Typography from "@mui/material/Typography";
@@ -44,6 +43,10 @@ import HistoryDetail from "./tabs/manage_app/history/history_detail";
 import Education from "./tabs/manage_app/education";
 import AddVendorForm from "../../forms/directories/add_vendor";
 import AddNewsForm from "../../forms/news/add_news_form";
+import AddProjectForm from "../../forms/projects/add_project_form";
+import EditProjectForm from "../../forms/projects/update_project_form";
+import AdsManager from "./tabs/manage_app/ads";
+import CreateAdsForm from "../../forms/ads/add_advert_form";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -134,6 +137,7 @@ function Dashboard(props) {
 
   const handleBackdrop = (value) => {
     setOpenSignoutBackDrop(value);
+    // console.log("b", openNotiModal);
   };
 
   const handleMobileMenuClose = () => {
@@ -157,14 +161,14 @@ function Dashboard(props) {
     setMobileOpen(!mobileOpen);
   };
 
-  const openMobileNotificationModal = (event) => {
-    handleMenuClose();
-    setOpenNotiModal(true);
-  };
+  // const openMobileNotificationModal = (event) => {
+  //   handleMenuClose();
+  setOpenNotiModal(true);
+  // };
 
-  const closeMobileNotificationModal = (event) => {
-    setOpenNotiModal(false);
-  };
+  // const closeMobileNotificationModal = (event) => {
+  //   setOpenNotiModal(false);
+  // };
 
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -195,9 +199,9 @@ function Dashboard(props) {
     ></Menu>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-  let resultTrail;
+  // const container =
+  //   window !== undefined ? () => window().document.body : undefined;
+  // let resultTrail;
   // const initials = userData?.First_Name?.slice(0, 1).toUpperCase() + userData?.Surname?.slice(0, 1).toUpperCase();
   // const trailName = userData?.First_Name + " " + userData?.Surname;
 
@@ -342,6 +346,28 @@ function Dashboard(props) {
 
             <Route path="/admin/dashboard/manage-app/projects" exact={true}>
               <Projects />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/projects/create"
+              exact={true}
+            >
+              <AddProjectForm />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/ads" exact={true}>
+              <AdsManager />
+            </Route>
+
+            <Route path="/admin/dashboard/manage-app/ads/create" exact={true}>
+              <CreateAdsForm />
+            </Route>
+
+            <Route
+              path="/admin/dashboard/manage-app/projects/update"
+              exact={true}
+            >
+              <EditProjectForm />
             </Route>
 
             <Route path="/admin/dashboard/manage-app/states" exact={true}>

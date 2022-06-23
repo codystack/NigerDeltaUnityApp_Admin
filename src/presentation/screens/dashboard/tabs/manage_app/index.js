@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CardItem = (props) => {
   const classes = useStyles();
-  const { image, title, excerpt, to } = props;
+  const { image, title, to } = props;
   const history = useHistory();
 
   return (
@@ -121,7 +121,7 @@ const ManageApp = () => {
     {
       title: "Ads Center",
       desc: "Manage adverts",
-      to: "/ads-center",
+      to: "/admin/dashboard/manage-app/ads",
       image: adsImage,
     },
     {

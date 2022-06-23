@@ -27,7 +27,11 @@ import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
-import { FirebaseError } from "@firebase/util";
+// import { FirebaseError } from "@firebase/util";
+// import QuillEditor from "../../components/misc/richtext/quill";
+import QuillEditable from "../../components/misc/richtext/edit_quill";
+import { useHistory, useLocation } from "react-router-dom";
+import { ArrowBackIosNew } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -70,14 +74,15 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const EditProjectForm = (props) => {
+const EditProjectForm = () => {
   const classes = useStyles();
-  let { setOpen, id, title, img, state, desc } = props;
+  const history = useHistory();
+  const location = useLocation();
+  let { id, title, img, state, desc } = location.state;
   const [formValues, setFormValues] = React.useState({
     title: title,
     image: "",
     state: state,
-    desc: desc,
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -86,12 +91,13 @@ const EditProjectForm = (props) => {
   const [previewImage, setPreviewImage] = React.useState("");
   const [statesList, setStatesList] = React.useState(null);
   const [stateId, setStateId] = React.useState(0);
+  const [descBody, setDescBody] = React.useState(desc);
 
   const { enqueueSnackbar } = useSnackbar();
 
   React.useEffect(() => {
     const q = query(collection(db, "states"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const states = [];
       querySnapshot.forEach((doc) => {
         states.push(doc.data());
@@ -148,11 +154,11 @@ const EditProjectForm = (props) => {
               title: formValues.title,
               state: formValues.state,
               stateId: stateId,
-              description: formValues.desc,
+              description: descBody,
               updatedAt: timeNow,
               image: downloadURL,
             });
-            setOpen(false);
+            history.goBack();
             setIsLoading(false);
             enqueueSnackbar(`Project updated successfully`, {
               variant: "success",
@@ -177,7 +183,6 @@ const EditProjectForm = (props) => {
     setFormValues({
       title: formValues.title ? formValues.title : title,
       state: formValues.state ? formValues.state : state,
-      desc: formValues?.desc ? formValues.desc : desc,
     });
     if (previewImage) {
       //Change only the featured image and all texts
@@ -207,10 +212,10 @@ const EditProjectForm = (props) => {
           title: formValues.title,
           state: formValues.state,
           stateId: stateId,
-          description: formValues.desc,
+          description: descBody,
           updatedAt: timeNow,
         });
-        setOpen(false);
+        history.goBack();
         setIsLoading(false);
         enqueueSnackbar(`Project updated successfully`, {
           variant: "success",
@@ -243,6 +248,23 @@ const EditProjectForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updateProject}>
+        <Box
+          display="flex"
+          flexDirection={"row"}
+          justifyContent="start"
+          alignItems={"start"}
+        >
+          <Button
+            variant="text"
+            onClick={() => history.goBack()}
+            startIcon={<ArrowBackIosNew />}
+          >
+            Back
+          </Button>
+          <Typography px={2} variant="h5">
+            Update Project
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator
@@ -312,27 +334,9 @@ const EditProjectForm = (props) => {
           errorMessages={["Project title is required"]}
         />
 
-        <TextValidator
-          className={classes.mb}
-          fullWidth
-          multiline
-          rows={5}
-          rowsMax={10}
-          placeholder="Type project description here"
-          name="desc"
-          label="Project Description"
-          value={
-            formValues.desc === " "
-              ? desc
-              : !formValues.desc
-              ? ""
-              : formValues.desc
-          }
-          onChange={handleChange}
-          variant="outlined"
-          validators={["required"]}
-          errorMessages={["News content is required"]}
-        />
+        <QuillEditable value={descBody} setValue={setDescBody} />
+
+        <br />
 
         <Button
           type="submit"

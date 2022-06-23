@@ -344,15 +344,6 @@ const AddProjectForm = (props) => {
           errorMessages={["Project title is required"]}
         />
 
-        {/* <RichText
-          value={body}
-          setValue={setBody}
-          error={isError}
-          label="Type description here"
-          setError={setIsError}
-          setIsStartedFilling={setIsStartedFilling}
-        /> */}
-
         <QuillEditor setValue={setBody} placeholder={"Type description here"} />
 
         {/* <TextValidator

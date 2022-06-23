@@ -156,19 +156,35 @@ const AddVendorForm = (props) => {
     const { id, name, value } = e.target;
 
     if (id === "image") {
-      setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
-      setFormValues((prevData) => ({
-        ...prevData,
-        image: e.target.value,
-      }));
+      try {
+        setFile(e.target.files[0]);
+        if (e.target?.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target?.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+        setFormValues((prevData) => ({
+          ...prevData,
+          image: e.target.value,
+        }));
+      } catch (e) {
+        console.log("ERROR", e);
+      }
     } else if (id === "logo") {
-      setLogoFile(e.target.files[0]);
-      setPreviewLogo(URL.createObjectURL(e.target.files[0]));
-      setFormValues((prevData) => ({
-        ...prevData,
-        logo: e.target.value,
-      }));
+      try {
+        setLogoFile(e.target.files[0]);
+        if (e.target?.files[0]) {
+          setPreviewLogo(URL.createObjectURL(e.target?.files[0]));
+        } else {
+          setPreviewLogo(placeholder);
+        }
+        setFormValues((prevData) => ({
+          ...prevData,
+          logo: e.target.value,
+        }));
+      } catch (e) {
+        console.log("ERROR", e);
+      }
     } else {
       setFormValues((prevData) => ({ ...prevData, [name]: value }));
     }
@@ -176,11 +192,13 @@ const AddVendorForm = (props) => {
 
   const createVendor = (e) => {
     setIsUploading(true);
+    console.log("POEK");
 
     //First upload images to firebase storage then save to firestore
     const timeNow = new Date();
     let storageRef = ref(storage, "vendors/" + timeNow.getTime());
     let storageRef2 = ref(storage, "vendors/img_" + timeNow.getTime());
+
     let uploadTask = uploadBytesResumable(storageRef, file);
     let uploadTask2 = uploadBytesResumable(storageRef2, logoFile);
     uploadTask.on(

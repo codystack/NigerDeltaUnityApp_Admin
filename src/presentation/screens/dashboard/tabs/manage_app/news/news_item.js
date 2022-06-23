@@ -224,7 +224,6 @@ const NewsItem = (props) => {
       <br />
 
       <div className={classes.lhsRow}>
-        {}
         <ReactQuill
           value={location?.state?.body}
           readOnly={true}

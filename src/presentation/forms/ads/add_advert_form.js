@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const places = ["Home page", "Directories", "News"];
+const places = ["Home page", "Directories", "News", "Projects"];
 
 const CircularProgressWithLabel = (props) => {
   return (

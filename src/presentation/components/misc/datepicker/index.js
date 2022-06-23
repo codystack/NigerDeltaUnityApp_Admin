@@ -1,15 +1,16 @@
 import "date-fns";
 import React from "react";
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
+// import DateFnsUtils from "@date-io/date-fns";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@mui/x-data-grid";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TextField } from "@mui/material";
 
 export default function DatePicker(props) {
   const { id, value, label, setFormData } = props;
 
-  const handleDateChange = (date) => {
+  const handleChange = (date) => {
     setFormData((prevData) => ({
       ...prevData,
       [id]: new Date(date).toDateString(),
@@ -17,8 +18,8 @@ export default function DatePicker(props) {
   };
 
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <KeyboardDatePicker
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      {/* <KeyboardDatePicker
         margin="normal"
         id={id}
         label={label}
@@ -35,7 +36,13 @@ export default function DatePicker(props) {
         KeyboardButtonProps={{
           "aria-label": "change date",
         }}
+      /> */}
+      <DateTimePicker
+        label={label}
+        value={value}
+        onChange={handleChange}
+        renderInput={(params) => <TextField {...params} />}
       />
-    </MuiPickersUtilsProvider>
+    </LocalizationProvider>
   );
 }

@@ -152,7 +152,6 @@ const ProjectsItemCard = (props) => {
         handleClose={() => setOpen(false)}
         bodyComponent={
           <EditProjectForm
-            setOpen={setOpen}
             img={image}
             title={title}
             id={id}
@@ -183,9 +182,20 @@ const ProjectsItemCard = (props) => {
           </div>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/dashboard/manage-app/projects/update",
+                  state: {
+                    img: image,
+                    title: title,
+                    id: id,
+                    state: state,
+                    desc: desc,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>
@@ -248,7 +258,7 @@ const Projects = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "projects"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const proj = [];
       querySnapshot.forEach((doc) => {
         proj.push(doc.data());
