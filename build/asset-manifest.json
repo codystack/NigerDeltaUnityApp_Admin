@@ -1,0 +1,39 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2de3b5c7.chunk.css",
+    "main.js": "/static/js/main.17b80a44.chunk.js",
+    "main.js.map": "/static/js/main.17b80a44.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.e01532f5.js",
+    "runtime-main.js.map": "/static/js/runtime-main.e01532f5.js.map",
+    "static/css/2.f83b9687.chunk.css": "/static/css/2.f83b9687.chunk.css",
+    "static/js/2.b0675bec.chunk.js": "/static/js/2.b0675bec.chunk.js",
+    "static/js/2.b0675bec.chunk.js.map": "/static/js/2.b0675bec.chunk.js.map",
+    "static/js/3.68a67941.chunk.js": "/static/js/3.68a67941.chunk.js",
+    "static/js/3.68a67941.chunk.js.map": "/static/js/3.68a67941.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.f83b9687.chunk.css.map": "/static/css/2.f83b9687.chunk.css.map",
+    "static/css/main.2de3b5c7.chunk.css.map": "/static/css/main.2de3b5c7.chunk.css.map",
+    "static/js/2.b0675bec.chunk.js.LICENSE.txt": "/static/js/2.b0675bec.chunk.js.LICENSE.txt",
+    "static/media/ads_ndua_admin.d63e032f.jpeg": "/static/media/ads_ndua_admin.d63e032f.jpeg",
+    "static/media/category_ndua_admin.13467d74.jpeg": "/static/media/category_ndua_admin.13467d74.jpeg",
+    "static/media/directories_ndua_admin.e012ca33.jpeg": "/static/media/directories_ndua_admin.e012ca33.jpeg",
+    "static/media/education_logo.c75edfed.jpeg": "/static/media/education_logo.c75edfed.jpeg",
+    "static/media/handshake.3f11bf95.jpeg": "/static/media/handshake.3f11bf95.jpeg",
+    "static/media/history_ndua_logo.a65ec4e1.jpeg": "/static/media/history_ndua_logo.a65ec4e1.jpeg",
+    "static/media/icon_blue.b32fb3d2.png": "/static/media/icon_blue.b32fb3d2.png",
+    "static/media/logo_white.56324aaf.png": "/static/media/logo_white.56324aaf.png",
+    "static/media/news_ndua_admin.136cb38d.jpeg": "/static/media/news_ndua_admin.136cb38d.jpeg",
+    "static/media/pattern.58059c25.png": "/static/media/pattern.58059c25.png",
+    "static/media/privacy.a5f87fb6.jpeg": "/static/media/privacy.a5f87fb6.jpeg",
+    "static/media/projects_ndua_admin.d4edf432.jpeg": "/static/media/projects_ndua_admin.d4edf432.jpeg",
+    "static/media/state_logo.9e3ea8f8.jpeg": "/static/media/state_logo.9e3ea8f8.jpeg",
+    "static/media/terms_of_service.e889ab0b.jpeg": "/static/media/terms_of_service.e889ab0b.jpeg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.e01532f5.js",
+    "static/css/2.f83b9687.chunk.css",
+    "static/js/2.b0675bec.chunk.js",
+    "static/css/main.2de3b5c7.chunk.css",
+    "static/js/main.17b80a44.chunk.js"
+  ]
+}
