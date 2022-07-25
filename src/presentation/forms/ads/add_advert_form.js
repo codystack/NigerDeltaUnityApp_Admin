@@ -23,6 +23,8 @@ import { Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import placeholder from "../../../assets/images/placeholder.png";
 import DatePicker from "../../components/misc/datepicker";
+import { useHistory } from "react-router-dom";
+import { ArrowBackIosNew } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -52,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const places = ["Home page", "Directories", "News", "Projects"];
+const places = ["Home page", "Directories"];
 
 const CircularProgressWithLabel = (props) => {
   return (
@@ -86,8 +88,11 @@ const CircularProgressWithLabel = (props) => {
 
 const CreateAdsForm = (props) => {
   const classes = useStyles();
-  let { setOpen } = props;
+  const history = useHistory();
   const [formValues, setFormValues] = React.useState({
+    name: "",
+    phone: "",
+    address: "",
     banner: "",
     url: "",
     starts: "",
@@ -106,16 +111,26 @@ const CreateAdsForm = (props) => {
     const { id, name, value } = e.target;
 
     if (id === "banner") {
-      setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
-      setFormValues((prevData) => ({
-        ...prevData,
-        banner: e.target.value,
-      }));
+      try {
+        setFile(e.target.files[0]);
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+        setFormValues((prevData) => ({
+          ...prevData,
+          banner: e.target.value,
+        }));
+      } catch (e) {}
     } else {
       setFormValues((prevData) => ({ ...prevData, [name]: value }));
     }
   };
+
+  // React.useEffect(() => {
+  //   console.log("HJF", formValues.starts);
+  // }, []);
 
   const createAds = (e) => {
     setIsUploading(true);
@@ -145,14 +160,18 @@ const CreateAdsForm = (props) => {
             id: timeNow.getTime(),
             banner: downloadURL,
             url: formValues.url,
+            name: formValues.name,
+            phone: formValues.phone,
+            address: formValues.address,
             starts: formValues.starts,
             ends: formValues.ends,
+            status: "Pending",
             placement: formValues.placement,
             createdAt: timeNow,
             updatedAt: timeNow,
           })
             .then((res) => {
-              setOpen(false);
+              history.goBack();
               setIsLoading(false);
               enqueueSnackbar(`Ad created successfully`, {
                 variant: "success",
@@ -184,6 +203,25 @@ const CreateAdsForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={createAds}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            variant="text"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Create New Advert
+          </Typography>
+        </Box>
         <TextValidator
           ref={coverRef}
           id="banner"
@@ -207,8 +245,8 @@ const CreateAdsForm = (props) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            height: 144,
-            width: 420,
+            height: 256,
+            width: "100%",
             backgroundImage: "url(" + previewImage + ")",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -226,7 +264,7 @@ const CreateAdsForm = (props) => {
               marginBottom: -32,
             }}
           >
-            <label htmlFor="banner" style={{ marginBottom: 24, padding: 8 }}>
+            <label htmlFor="banner" style={{ marginBottom: 24, padding: 16 }}>
               <div className={classes.subRow}>
                 <EditIcon color="primary" fontSize="small" />
                 <Typography color="blue">Edit</Typography>
@@ -235,19 +273,73 @@ const CreateAdsForm = (props) => {
           </div>
         </label>
 
-        <TextValidator
-          className={classes.mb}
-          label="Url Link"
-          size="small"
-          variant="outlined"
-          required
-          value={formValues.url}
-          onChange={handleChange}
-          name="url"
-          fullWidth
-          validators={["required"]}
-          errorMessages={["Ad's url link is required"]}
-        />
+        <Grid container spacing={1} padding={0} marginBottom={0}>
+          <Grid item xs={12} sm={6} md={6}>
+            <TextValidator
+              className={classes.mb}
+              label="Client's Name"
+              size="small"
+              variant="outlined"
+              required
+              value={formValues.name}
+              onChange={handleChange}
+              name="name"
+              fullWidth
+              validators={["required"]}
+              errorMessages={["Client's name is required"]}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={6}>
+            <TextValidator
+              className={classes.mb}
+              label="Address"
+              size="small"
+              variant="outlined"
+              required
+              value={formValues.address}
+              onChange={handleChange}
+              name="address"
+              fullWidth
+              validators={["required"]}
+              errorMessages={["Address is required"]}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={1} padding={0} marginBottom={0}>
+          <Grid item xs={12} sm={6} md={6}>
+            <TextValidator
+              className={classes.mb}
+              label="Phone number"
+              size="small"
+              variant="outlined"
+              required
+              value={formValues.phone}
+              onChange={handleChange}
+              name="phone"
+              fullWidth
+              validators={["required"]}
+              errorMessages={["Phone number is required"]}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={6}>
+            <TextValidator
+              className={classes.mb}
+              label="Url Link"
+              size="small"
+              variant="outlined"
+              required
+              value={formValues.url}
+              onChange={handleChange}
+              name="url"
+              fullWidth
+              validators={["required"]}
+              errorMessages={["Ad's url link is required"]}
+            />
+          </Grid>
+        </Grid>
 
         <Grid container spacing={1} padding={0} marginBottom={0}>
           <Grid item xs={12} sm={6} md={6}>
@@ -272,7 +364,7 @@ const CreateAdsForm = (props) => {
             </div>
           </Grid>
         </Grid>
-
+        <br />
         <SelectValidator
           className={classes.mb}
           value={formValues.placement}

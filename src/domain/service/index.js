@@ -4,13 +4,13 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import {
-  setPersistence,
-  browserSessionPersistence,
+  // setPersistence,
+  // browserSessionPersistence,
   setDoc,
   doc,
   db,
 } from "../../data/firebase/";
-import { useSnackbar } from "notistack";
+// import { useSnackbar } from "notistack";
 
 // export default function Service() {
 //   const { enqueueSnackbar } = useSnackbar();
@@ -21,11 +21,11 @@ export const createUser = async (email, pass) => {
 };
 
 export const signInUser = async (email, pass) => {
-  try {
-    return await signInWithEmailAndPassword(auth, email, pass);
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  return await signInWithEmailAndPassword(auth, email, pass);
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
 
 export const addCategory = async (id, name, image) => {

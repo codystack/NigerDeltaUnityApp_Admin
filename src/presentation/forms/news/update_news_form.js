@@ -107,7 +107,7 @@ const EditNewsForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());

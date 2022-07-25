@@ -1,13 +1,12 @@
 import React from "react";
-import { Avatar, Button, Divider, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { IconButton } from "@mui/material";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import EditDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
+// import EditNewsForm from "../../../../../forms/news/update_news_form";
 import { useSnackbar } from "notistack";
 import {
   deleteDoc,
@@ -19,9 +18,9 @@ import {
 } from "../../../../../../data/firebase";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
-import { Add } from "@mui/icons-material";
-import AddProductForm from "../../../../../forms/products/add_product";
-import Products from "./products";
+import NumberFormat from "react-number-format";
+import { Box } from "@mui/system";
+import ReactQuill from "react-quill";
 
 const useStyles = makeStyles((theme) => ({
   row: {
@@ -76,19 +75,22 @@ const ProductDetail = (props) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const [openEdit, setOpenEdit] = React.useState(false);
+  // const [openEdit, setOpenEdit] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const deleteProduct = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "products/" + location?.state?.id);
+    const fileRef = ref(
+      storage,
+      location.state.vendorName + "catalog/" + location?.state?.id
+    );
 
     deleteObject(fileRef)
       .then(async () => {
         // Images deleted now delete from firestore,
         try {
-          await deleteDoc(doc(db, "products", "" + location?.state?.id));
+          await deleteDoc(doc(db, "catalogs", "" + location?.state?.id));
           enqueueSnackbar(`Item deleted successfully`, {
             variant: "success",
           });
@@ -132,35 +134,23 @@ const ProductDetail = (props) => {
     </div>
   );
 
+  let modules = {
+    toolbar: null,
+  };
+
   return (
     <>
       <EditDialog
         open={open}
-        title="Update Product"
+        title="Update Catalog"
         handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditNewsForm
-            setOpen={setOpen}
-            img={location?.state?.image}
-            name={location?.state?.name}
-            id={location?.state?.id}
-            address={location?.state?.address}
-            phone={location?.state?.phone}
-            website={location?.state?.website}
-            description={location?.state?.description}
-            category={location?.state?.category}
-            createdAt={location?.state?.createdAt}
-            updatedAt={location?.state?.updatedAt}
-            logo={location?.state?.logo}
-            is24hrs={location?.state?.is24hrs}
-            opensAt={location?.state?.opensAt}
-            closesAt={location?.state?.closesAt}
-          />
-        }
+        // bodyComponent={
+
+        // }
       />
       <DeleteDialog
         open={openDelete}
-        title="Delete Product"
+        title="Delete Catalog"
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
       />
@@ -222,15 +212,34 @@ const ProductDetail = (props) => {
         </div>
       </div>
 
-      <Typography fontSize={14} variant="h6" textAlign="start">
-        {location?.state?.delivery}
-      </Typography>
+      <Box
+        display={"flex"}
+        fleDirection="row"
+        justifyContent={"start"}
+        alignItems="center"
+        width="100%"
+        padding={1}
+      >
+        <NumberFormat
+          value={location?.state?.price}
+          displayType={"text"}
+          thousandSeparator={true}
+          prefix={"₦"}
+        />
+        <Typography pl={1} fontSize={13}>
+          {location?.state?.vendorName + "".toLowerCase().includes("hotel")
+            ? "per night"
+            : ""}
+        </Typography>
+      </Box>
       <br />
 
       <div className={classes.lhsRow}>
-        <Typography fontSize={15} variant="h6" textAlign="start">
-          {location?.state?.desc}
-        </Typography>
+        <ReactQuill
+          value={location?.state?.desc}
+          readOnly={true}
+          modules={modules}
+        />
       </div>
       <br />
     </>

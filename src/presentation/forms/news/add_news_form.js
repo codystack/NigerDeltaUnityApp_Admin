@@ -324,13 +324,6 @@ const AddNewsForm = (props) => {
           </Grid>
         </Grid>
 
-        {/* <RichText
-          value={newsBody}
-          setValue={setNewsBody}
-          error={isError}
-          setError={setIsError}
-          setIsStartedFilling={setIsStartedFilling}
-        /> */}
         <QuillEditor setValue={setNewsBody} placeholder={"Type news here..."} />
         <br />
         <TextField

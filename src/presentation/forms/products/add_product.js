@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  ValidatorForm,
-  TextValidator,
-  SelectValidator,
-} from "react-material-ui-form-validator";
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 import Avatar from "@mui/material/Avatar";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
@@ -15,16 +11,15 @@ import {
   doc,
   uploadBytesResumable,
   getDownloadURL,
-  query,
-  collection,
-  updateDoc,
-  onSnapshot,
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress, Grid, MenuItem } from "@mui/material";
+import { CircularProgress, Grid, TextField } from "@mui/material";
 import { Typography } from "@mui/material";
+import placeholder from "../../../assets/images/placeholder.png";
+import NumberFormat from "react-number-format";
+import QuillEditor from "../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -69,52 +64,49 @@ const CircularProgressWithLabel = (props) => {
 
 const AddProductForm = (props) => {
   const classes = useStyles();
-  let {
-    setOpen,
-    vendorID,
-    vendorAddress,
-    vendorName,
-    vendorPhone,
-    vendorWebsite,
-  } = props;
-  let deliveryTypes = ["Free delivery", "Pick up", "Pay on delivery"];
+  let { setOpen, vendorID, vendorAddress, vendorPhone, vendorName } = props;
+  // let deliveryTypes = ["Free delivery", "Pick up", "Pay on delivery"];
   const [formValues, setFormValues] = React.useState({
     name: "",
     image: "",
-    vendorName: "",
-    delivery: "",
     vendorAddress: "",
     vendorPhone: "",
-    vendorWebsite: "",
-    description: "",
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const [previewImage, setPreviewImage] = React.useState("");
+  const [previewImage, setPreviewImage] = React.useState(placeholder);
+  const [price, setPrice] = React.useState();
+  const [description, setDescription] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
 
     if (id === "image") {
-      setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
-      setFormValues((prevData) => ({
-        ...prevData,
-        image: e.target.value,
-      }));
+      try {
+        setFile(e.target.files[0]);
+        if (e.target?.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target?.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+        setFormValues((prevData) => ({
+          ...prevData,
+          image: e.target.value,
+        }));
+      } catch (e) {}
     } else {
       setFormValues((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
-  const createNews = (e) => {
+  const createCatalog = (e) => {
     setIsUploading(true);
     const timeNow = new Date();
     //First upload images to firebase storage then save to firestore
-    let storageRef = ref(storage, "products/" + timeNow.getTime());
+    let storageRef = ref(storage, vendorName + "catalog/" + timeNow.getTime());
     let uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -133,24 +125,23 @@ const AddProductForm = (props) => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setIsUploading(false);
           setIsLoading(true);
-          setDoc(doc(db, "products", `${timeNow.getTime()}`), {
+          setDoc(doc(db, "catalogs", `${timeNow.getTime()}`), {
             id: timeNow.getTime(),
             name: formValues.name,
             image: downloadURL,
-            delivery: formValues.delivery,
             vendorID: vendorID,
             vendorName: vendorName,
             vendorPhone: vendorPhone,
             vendorAddress: vendorAddress,
-            vendorWebsite: vendorWebsite,
-            description: formValues.description,
+            description: description,
+            price: price,
             createdAt: timeNow,
             updatedAt: timeNow,
           })
             .then((res) => {
               setOpen(false);
               setIsLoading(false);
-              enqueueSnackbar(`New product added successfully`, {
+              enqueueSnackbar(`New catalog added successfully`, {
                 variant: "success",
               });
             })
@@ -183,7 +174,7 @@ const AddProductForm = (props) => {
           <div />
         )}
       </Backdrop>
-      <ValidatorForm onSubmit={createNews}>
+      <ValidatorForm onSubmit={createCatalog}>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator
@@ -198,8 +189,8 @@ const AddProductForm = (props) => {
               accept=".png, .jpg, .jpeg"
               onChange={handleChange}
               validators={["required"]}
-              errorMessages={["Product image is required"]}
-              helperText="Product image"
+              errorMessages={["Image is required"]}
+              helperText="Featured image"
             />
           </Grid>
 
@@ -217,54 +208,42 @@ const AddProductForm = (props) => {
           </Grid>
         </Grid>
 
-        <SelectValidator
-          className={classes.mb}
-          value={formValues.delivery}
-          onChange={handleChange}
-          label="Delivery type"
-          name="delivery"
-          fullWidth
-          variant="outlined"
-          size="small"
-          validators={["required"]}
-          errorMessages={["Delivery type is required"]}
-        >
-          {(deliveryTypes ?? [])?.map((item, index) => (
-            <MenuItem key={index} value={item ?? ""}>
-              {item ?? ""}
-            </MenuItem>
-          ))}
-        </SelectValidator>
-
         <TextValidator
           className={classes.mb}
           id="name"
-          label="Product name"
+          label="Title"
           size="small"
           variant="outlined"
           value={formValues.name}
           onChange={handleChange}
           name="name"
           fullWidth
+          required
           validators={["required"]}
-          errorMessages={["Product name is required"]}
+          errorMessages={["Title is required"]}
         />
 
-        <TextValidator
-          className={classes.mb}
+        <NumberFormat
+          customInput={TextField}
+          onValueChange={(values) => setPrice(values.value)}
+          value={price}
+          thousandSeparator={true}
+          prefix={"₦"}
           fullWidth
-          multiline
-          rows={5}
-          rowsMax={10}
-          placeholder="Type description here"
-          name="description"
-          label="Product description"
-          value={formValues.description}
-          onChange={handleChange}
+          size="small"
+          placeholder="Enter price"
           variant="outlined"
-          validators={["required"]}
-          errorMessages={["Product description is required"]}
+          label="Price"
+          required
         />
+        <br />
+        <br />
+
+        <QuillEditor
+          setValue={setDescription}
+          placeholder={"Type description here..."}
+        />
+        <br />
 
         <Button
           type="submit"

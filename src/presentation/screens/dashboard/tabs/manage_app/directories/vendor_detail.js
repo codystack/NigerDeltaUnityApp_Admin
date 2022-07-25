@@ -3,25 +3,26 @@ import { Avatar, Button, Divider, Typography } from "@mui/material";
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { IconButton } from "@mui/material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
-import { useSnackbar } from "notistack";
-import {
-  deleteDoc,
-  deleteObject,
-  ref,
-  db,
-  doc,
-  storage,
-} from "../../../../../../data/firebase";
-import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
+// import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
+// import { useSnackbar } from "notistack";
+// import {
+//   deleteDoc,
+//   deleteObject,
+//   ref,
+//   db,
+//   doc,
+//   storage,
+//   query,
+//   collection,
+//   onSnapshot,
+// } from "../../../../../../data/firebase";
+// import Delete from "@mui/icons-material/Delete";
+// import Edit from "@mui/icons-material/Edit";
 import { Add } from "@mui/icons-material";
 import AddProductForm from "../../../../../forms/products/add_product";
 import Products from "./products";
+import { Box } from "@mui/system";
 
 const useStyles = makeStyles((theme) => ({
   row: {
@@ -76,73 +77,16 @@ const VendorItem = (props) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  const [openEdit, setOpenEdit] = React.useState(false);
-  const [openDelete, setOpenDelete] = React.useState(false);
-  const [productList, setProductList] = React.useState(null);
-  const { enqueueSnackbar } = useSnackbar();
-
-  const deleteVendor = () => {
-    setOpenDelete(false);
-    const fileRef = ref(storage, "news/" + location?.state?.id);
-    const fileRef2 = ref(storage, "news/img_" + location?.state?.id);
-
-    deleteObject(fileRef)
-      .then(() => {
-        deleteObject(fileRef2)
-          .then(async () => {
-            // Images deleted now delete from firestore,
-            try {
-              await deleteDoc(doc(db, "news", "" + location?.state?.id));
-              enqueueSnackbar(`Item deleted successfully`, {
-                variant: "success",
-              });
-            } catch (error) {
-              console.log("ERR: Del: ", error);
-              enqueueSnackbar(`Item not deleted. Try again`, {
-                variant: "error",
-              });
-            }
-          })
-          .catch((err) => {});
-      })
-      .catch((error) => {
-        console.log("ErR: ", error);
-      });
-  };
-
-  const deleteBody = (
-    <div>
-      <Typography variant="body2" gutterBottom>
-        {`Are you sure you want to delete ${location?.state?.title} ?`}
-      </Typography>
-      <br />
-      <div className={classes.subRow}>
-        <Button
-          size="small"
-          variant="contained"
-          style={{ marginRight: 4 }}
-          onClick={() => setOpenDelete(false)}
-        >
-          Cancel
-        </Button>
-
-        <Button
-          size="small"
-          variant="contained"
-          color="error"
-          onClick={deleteVendor}
-        >
-          Delete
-        </Button>
-      </div>
-    </div>
-  );
+  // const [openEdit, setOpenEdit] = React.useState(false);
+  // const [openDelete, setOpenDelete] = React.useState(false);
+  // const [productList, setProductList] = React.useState(null);
+  // const { enqueueSnackbar } = useSnackbar();
 
   return (
     <>
       <CustomDialog
         open={open}
-        title="Add Product"
+        title="Add Catalog"
         handleClose={() => setOpen(false)}
         bodyComponent={
           <AddProductForm
@@ -155,36 +99,13 @@ const VendorItem = (props) => {
           />
         }
       />
-      {/* <EditDialog
-        open={open}
-        title="Update News"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditNewsForm
-            setOpen={setOpen}
-            img={location?.state?.image}
-            name={location?.state?.name}
-            id={location?.state?.id}
-            address={location?.state?.address}
-            phone={location?.state?.phone}
-            website={location?.state?.website}
-            description={location?.state?.description}
-            category={location?.state?.category}
-            createdAt={location?.state?.createdAt}
-            updatedAt={location?.state?.updatedAt}
-            logo={location?.state?.logo}
-            is24hrs={location?.state?.is24hrs}
-            opensAt={location?.state?.opensAt}
-            closesAt={location?.state?.closesAt}
-          />
-        }
-      /> */}
-      <DeleteDialog
+
+      {/* <DeleteDialog
         open={openDelete}
         title="Delete Product"
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
-      />
+      /> */}
       <div className={classes.row}>
         <Button
           startIcon={<ArrowBackIosNewIcon />}
@@ -203,13 +124,7 @@ const VendorItem = (props) => {
           </Typography>
         </div>
 
-        <Button
-          startIcon={<Add />}
-          variant="contained"
-          onClick={() => setOpen(true)}
-        >
-          Add Product
-        </Button>
+        <div />
       </div>
       <br />
       {/* Image Section */}
@@ -294,9 +209,28 @@ const VendorItem = (props) => {
       <Divider />
       <br />
       <div>
-        <Typography gutterBottom variant="h6">
-          Vendor Products
-        </Typography>
+        <Box
+          display="flex"
+          flexDirection={"row"}
+          justifyContent="space-between"
+          alignItems={"center"}
+        >
+          <Typography
+            gutterBottom
+            variant="h6"
+            fontWeight={700}
+            color="#0C0C77"
+          >
+            Product/Service Catalog
+          </Typography>
+          <Button
+            startIcon={<Add />}
+            variant="contained"
+            onClick={() => setOpen(true)}
+          >
+            Add Catalog
+          </Button>
+        </Box>
         <Products vendorID={location?.state?.id} />
       </div>
     </>

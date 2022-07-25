@@ -2,7 +2,6 @@ import React from "react";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import { CardActionArea, Divider, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import Card from "@mui/material/Card";
@@ -26,13 +25,13 @@ import {
 import { useSnackbar } from "notistack";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import EditProjectForm from "../../../../../forms/projects/update_project_form";
-import AddProjectForm from "../../../../../forms/projects/add_project_form";
+import NumberFormat from "react-number-format";
+import { Box } from "@mui/system";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: 360,
+    height: 300,
     width: "100%",
   },
   row: {
@@ -87,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProductItemCard = (props) => {
-  const { image, name, id, createdAt, delivery, item, updatedAt, desc } = props;
+  const { image, name, id, item, updatedAt, desc } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
@@ -96,12 +95,12 @@ const ProductItemCard = (props) => {
 
   const deleteProduct = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "products/" + id);
+    const fileRef = ref(storage, item?.vendorName + "catalog/" + id);
 
     deleteObject(fileRef)
       .then(async () => {
         try {
-          await deleteDoc(doc(db, "products", "" + id));
+          await deleteDoc(doc(db, "catalogs", "" + id));
           enqueueSnackbar(`Item deleted successfully`, {
             variant: "success",
           });
@@ -120,7 +119,7 @@ const ProductItemCard = (props) => {
   const deleteBody = (
     <div>
       <Typography variant="body2" gutterBottom>
-        {`Are you sure you want to delete ${name} ?`}
+        {`Are you sure you want to delete ${item?.name} ?`}
       </Typography>
       <br />
       <div className={classes.subRow}>
@@ -149,15 +148,15 @@ const ProductItemCard = (props) => {
     <>
       <CustomDialog
         open={open}
-        title="Update Product"
+        title="Update Item"
         handleClose={() => setOpen(false)}
         bodyComponent={
           <EditProjectForm
             setOpen={setOpen}
             img={image}
-            title={name}
+            title={item?.name}
             id={id}
-            delivery={delivery}
+            price={item?.price}
             desc={desc}
           />
         }
@@ -172,9 +171,6 @@ const ProductItemCard = (props) => {
         <div className={classes.rowHeader}>
           <div className={classes.lhsRow}>
             <div className={classes.column}>
-              <Typography variant="body2" fontSize={14}>
-                {delivery}
-              </Typography>
               <Typography variant="body2" fontSize={13}>
                 {`${new Date(updatedAt?.seconds * 1000).toLocaleDateString(
                   "en-US"
@@ -212,7 +208,9 @@ const ProductItemCard = (props) => {
                 name: item?.name,
                 image: item?.image,
                 desc: item?.description,
-                delivery: item?.delivery,
+                price: item?.price,
+                vendorName: item?.vendorName,
+                vendorID: item?.vendorID,
                 createdAt: item?.createdAt,
                 updatedAt: item?.updatedAt,
               },
@@ -223,7 +221,8 @@ const ProductItemCard = (props) => {
           <Divider />
           <div className={classes.row}>
             <Typography
-              fontSize={16}
+              pt={1}
+              fontSize={18}
               color="black"
               paddingLeft={1}
               textAlign="start"
@@ -233,20 +232,26 @@ const ProductItemCard = (props) => {
             </Typography>
           </div>
 
-          <Typography
-            justifyContent="stretch"
-            textAlign="left"
-            fontSize={14}
-            color="black"
+          <Box
+            display={"flex"}
+            fleDirection="row"
+            justifyContent={"start"}
+            alignItems="center"
+            width="100%"
             padding={1}
           >
-            {desc?.length > 100 ? desc?.substring(0, 100) + "..." : desc}
-          </Typography>
-          <div className={classes.subRow}>
-            <Button variant="text" size="small">
-              View
-            </Button>
-          </div>
+            <NumberFormat
+              value={item?.price}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"₦"}
+            />
+            <Typography pl={1} fontSize={13}>
+              {item?.vendorName + "".toLowerCase().includes("hotel")
+                ? "per night"
+                : ""}
+            </Typography>
+          </Box>
         </CardActionArea>
       </Card>
     </>
@@ -256,36 +261,25 @@ const ProductItemCard = (props) => {
 const Products = (props) => {
   const { vendorID } = props;
   const classes = useStyles();
-  const history = useHistory();
-  const [open, setOpen] = React.useState(false);
+  // const history = useHistory();
+  // const [open, setOpen] = React.useState(false);
   const [productsList, setProductsList] = React.useState(null);
 
-  //   React.useEffect(() => {
-  //     const q = query(collection(db, "products"), where());
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       const prod = [];
-  //       querySnapshot.forEach((doc) => {
-  //         prod.push(doc.data());
-  //       });
-  //       setProductsList(prod);
-  //     });
-  //   }, []);
-
   React.useEffect(() => {
-    const usersRef = collection(db, "products");
-    const q = query(usersRef, where("vendorID", "==", vendorID));
+    const refs = collection(db, "catalogs");
+    const q = query(refs, where("vendorID", "==", vendorID));
     onSnapshot(q, (querySnapshot) => {
       const prod = [];
       querySnapshot.forEach((doc) => {
         prod.push(doc.data());
       });
       setProductsList(prod);
-      console.log("Ve: " + vendorID + " : ", productsList);
+      // console.log("Ve: " + vendorID + " : ", productsList);
     });
     return () => {
       setProductsList([]);
     };
-  }, []);
+  }, [vendorID]);
 
   return (
     <div>
@@ -303,7 +297,6 @@ const Products = (props) => {
                 image={productsList[index]?.image}
                 name={productsList[index]?.name}
                 desc={productsList[index]?.description}
-                delivery={productsList[index]?.delivery}
                 createdAt={productsList[index]?.createdAt}
                 updatedAt={productsList[index]?.updatedAt}
               />

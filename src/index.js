@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { SnackbarProvider } from "notistack";
 import Button from "@mui/material/Button";
-import { app, analytics, auth } from "./data/firebase";
+// import { app, analytics, auth } from "./data/firebase";
 import Theme from "./domain/helper/themes";
 
 const theme = createTheme(Theme);

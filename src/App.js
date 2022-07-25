@@ -24,7 +24,6 @@ function App() {
         onSnapshot(doc(db, "users", "" + user.uid), (doc) => {
           // userData(doc.data());
           dispatch(setUserData(doc.data()));
-          console.log(doc.data());
         });
       }
 

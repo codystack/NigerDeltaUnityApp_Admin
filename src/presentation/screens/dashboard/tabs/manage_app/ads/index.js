@@ -1,21 +1,23 @@
 import React from "react";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
-import { Divider, Typography } from "@mui/material";
+import { Divider, List, ListItem, Typography } from "@mui/material";
 import {
   Add,
   Call,
   DeleteOutlined,
   EditOutlined,
   LocationOn,
+  Pages,
   Person,
-  PinDrop,
-  Web,
+  Public,
+  ToggleOffOutlined,
+  ToggleOnOutlined,
 } from "@mui/icons-material";
 import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
+import StatusDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import IconButton from "@mui/material/IconButton";
-import { Grid } from "@mui/material";
 import {
   onSnapshot,
   query,
@@ -28,11 +30,11 @@ import {
   deleteDoc,
 } from "../../../../../../data/firebase";
 import { useSnackbar } from "notistack";
-// import AddNewsForm from "../../../../../forms/news/add_news_form";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Box } from "@mui/system";
+import CustomizedSwitch from "../../../../../components/misc/switch";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -91,12 +93,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AdsItem = (props) => {
-  const { item, index } = props;
+  const { item } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [openStatus, setOpenStatus] = React.useState(false);
+  const [isActive, setIsActive] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   //   const history = useHistory();
+
+  React.useEffect(() => {
+    if (item?.status) {
+      setIsActive(item?.status === "Active" ? true : false);
+    }
+  }, [item?.status]);
 
   const deleteAd = () => {
     setOpenDelete(false);
@@ -149,14 +159,30 @@ const AdsItem = (props) => {
     </div>
   );
 
+  const statusBody = (
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent={"center"}
+      alignItems="center"
+    >
+      <Typography variant="h6" gutterBottom>
+        {`Change Status`}
+      </Typography>
+      <br />
+      <Typography>{item?.status}</Typography>
+      <div className={classes.subRow}>
+        {<CustomizedSwitch value={isActive} setValue={setIsActive} />}
+      </div>
+    </Box>
+  );
+
   return (
     <>
       <CustomDialog
         open={open}
-        title="Update News"
+        title="Update Ad"
         handleClose={() => setOpen(false)}
-        // bodyComponent={
-        // }
       />
       <DeleteDialog
         open={openDelete}
@@ -164,28 +190,22 @@ const AdsItem = (props) => {
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
       />
-
+      <StatusDialog
+        open={openStatus}
+        title="Change Ad Status"
+        handleClose={() => setOpenStatus(false)}
+        bodyComponent={statusBody}
+      />
       <Box
         display={"flex"}
         flexDirection="row"
         justifyContent={"space-between"}
         alignItems="center"
         padding={2}
+        width="100%"
       >
         <Box
-          display={"flex"}
-          flexDirection="row"
-          justifyContent={"start"}
-          alignItems="center"
-        >
-          <Typography variant="h5" pr={1}>
-            {index + 1}
-          </Typography>
-
-          <img src={item?.image} alt="" width={"40%"} />
-        </Box>
-
-        <Box
+          width={"100%"}
           display={"flex"}
           flexDirection="column"
           justifyContent={"start"}
@@ -198,8 +218,8 @@ const AdsItem = (props) => {
             alignItems="center"
           >
             <Person />
-            <Typography paddingX={2} variant="h6">
-              {item?.vendor}
+            <Typography gutterBottom paddingX={2}>
+              {item?.name}
             </Typography>
           </Box>
 
@@ -210,7 +230,7 @@ const AdsItem = (props) => {
             alignItems="center"
           >
             <LocationOn />
-            <Typography paddingX={2} variant="h6">
+            <Typography gutterBottom paddingX={2}>
               {item?.address}
             </Typography>
           </Box>
@@ -221,9 +241,9 @@ const AdsItem = (props) => {
             justifyContent={"start"}
             alignItems="center"
           >
-            <Web />
-            <Typography paddingX={2} variant="h6">
-              {item?.website}
+            <Public />
+            <Typography gutterBottom paddingX={2}>
+              {item?.url}
             </Typography>
           </Box>
 
@@ -234,7 +254,7 @@ const AdsItem = (props) => {
             alignItems="center"
           >
             <Call />
-            <Typography paddingX={2} variant="h6">
+            <Typography gutterBottom paddingX={2}>
               {item?.phone}
             </Typography>
           </Box>
@@ -245,8 +265,8 @@ const AdsItem = (props) => {
             justifyContent={"start"}
             alignItems="center"
           >
-            <Call />
-            <Typography paddingX={2} variant="h6">
+            <Pages />
+            <Typography gutterBottom paddingX={2}>
               {item?.placement}
             </Typography>
           </Box>
@@ -257,10 +277,10 @@ const AdsItem = (props) => {
             justifyContent={"start"}
             alignItems="center"
           >
-            <PinDrop />
+            <ToggleOnOutlined />
             <Typography
+              gutterBottom
               paddingX={2}
-              variant="h6"
               color={
                 item?.status === "active"
                   ? "orangered"
@@ -276,16 +296,46 @@ const AdsItem = (props) => {
 
         <Box
           display={"flex"}
+          flexDirection="row"
+          justifyContent={"center"}
+          alignItems="center"
+        >
+          <img src={item?.banner} alt="" width={"75%"} />
+        </Box>
+
+        <Box
+          display={"flex"}
           flexDirection="column"
           justifyContent={"end"}
           alignItems="end"
         >
           <IconButton color="error">
+            <Typography>Delete</Typography>
             <DeleteOutlined />
           </IconButton>
 
           <IconButton color="primary">
+            <Typography>Update</Typography>
             <EditOutlined />
+          </IconButton>
+
+          <IconButton color="primary">
+            {item?.status === "Active" ? (
+              <>
+                <Typography>Stop</Typography>
+                <ToggleOffOutlined />
+              </>
+            ) : item?.status === "Completed" ? (
+              <>
+                <Typography>Run again</Typography>
+                <ToggleOnOutlined />
+              </>
+            ) : (
+              <>
+                <Typography>Start</Typography>
+                <ToggleOnOutlined />
+              </>
+            )}
           </IconButton>
         </Box>
       </Box>
@@ -344,17 +394,18 @@ const AdsManager = () => {
       <br />
       <div>
         {adsList && (
-          <Grid
-            container
-            spacing={{ xs: 2, md: 2 }}
-            columns={{ xs: 4, sm: 8, md: 12 }}
+          <List
+            disablePadding={true}
+            // container
+            // spacing={{ xs: 2, md: 2 }}
+            // columns={{ xs: 4, sm: 8, md: 12 }}
           >
             {adsList?.map((item, index) => (
-              <Grid item xs={12} sm={6} md={6} key={index}>
-                <AdsItem item={item} index={index} />
-              </Grid>
+              <ListItem key={index} disableGutters={true} divider={true}>
+                <AdsItem item={item} />
+              </ListItem>
             ))}
-          </Grid>
+          </List>
         )}
         {adsList?.length < 1 && (
           <div className={classes.main}>

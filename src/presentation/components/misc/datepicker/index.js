@@ -2,7 +2,7 @@ import "date-fns";
 import React from "react";
 // import DateFnsUtils from "@date-io/date-fns";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 // import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@mui/x-data-grid";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TextField } from "@mui/material";
@@ -37,11 +37,15 @@ export default function DatePicker(props) {
           "aria-label": "change date",
         }}
       /> */}
-      <DateTimePicker
+      <DesktopDatePicker
         label={label}
+        inputFormat="MM/dd/yyyy"
         value={value}
+        closeOnSelect={true}
         onChange={handleChange}
-        renderInput={(params) => <TextField {...params} />}
+        renderInput={(params) => (
+          <TextField {...params} size="small" fullWidth />
+        )}
       />
     </LocalizationProvider>
   );

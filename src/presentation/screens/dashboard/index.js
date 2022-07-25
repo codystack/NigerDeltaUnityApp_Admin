@@ -129,7 +129,7 @@ function Dashboard(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [openSignoutBackDrop, setOpenSignoutBackDrop] = React.useState(false);
-  const [openNotiModal, setOpenNotiModal] = React.useState(false);
+  // const [openNotiModal, setOpenNotiModal] = React.useState(false);
   // const dispatch = useDispatch();
 
   const isMenuOpen = Boolean(anchorEl);
@@ -163,7 +163,7 @@ function Dashboard(props) {
 
   // const openMobileNotificationModal = (event) => {
   //   handleMenuClose();
-  setOpenNotiModal(true);
+  // setOpenNotiModal(true);
   // };
 
   // const closeMobileNotificationModal = (event) => {

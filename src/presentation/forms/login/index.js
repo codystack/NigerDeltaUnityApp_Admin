@@ -1,8 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
+// import Link from "@mui/material/Link";
+// import Typography from "@mui/material/Typography";
 
 import { signInUser } from "../../../domain/service";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
@@ -10,10 +9,9 @@ import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 import {
   db,
   doc,
-  getDoc,
-  setPersistence,
-  browserSessionPersistence,
-  auth,
+  // setPersistence,
+  // browserSessionPersistence,
+  // auth,
   onSnapshot,
 } from "../../../data/firebase";
 
@@ -26,26 +24,27 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { RefreshOutlined } from "@mui/icons-material";
 
 import { useDispatch } from "react-redux";
+import { useSnackbar } from "notistack";
 import { setUserData } from "../../../data/store/slice/user";
 import { useHistory } from "react-router-dom";
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+// function Copyright(props) {
+//   return (
+//     <Typography
+//       variant="body2"
+//       color="text.secondary"
+//       align="center"
+//       {...props}
+//     >
+//       {"Copyright © "}
+//       <Link color="inherit" href="https://mui.com/">
+//         Your Website
+//       </Link>{" "}
+//       {new Date().getFullYear()}
+//       {"."}
+//     </Typography>
+//   );
+// }
 
 const LoginForm = () => {
   const [formValues, setFormValues] = React.useState({
@@ -54,6 +53,7 @@ const LoginForm = () => {
   });
   const [showCode, setShowCode] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -66,36 +66,34 @@ const LoginForm = () => {
   const submitForm = async (e) => {
     setIsLoading(true);
 
-    setPersistence(auth, browserSessionPersistence)
-      .then((re) => {
-        signInUser(formValues.email, formValues.password)
-          .then(async (resp) => {
-            //Now get user data
-            // const docRef = doc(db, "users", resp.user.uid);
-            onSnapshot(doc(db, "users", resp.user.uid), (doc) => {
-              console.log("Current data: ", doc.data());
-              dispatch(setUserData(doc.data()));
-              history.push("/admin/dashboard");
-            });
-            // const docSnap = await getDoc(docRef);
-            // if (docSnap.exists()) {
-
-            // } else {
-            //   console.log("No such document!");
-            // }
-          })
-          .catch((err) => {
-            console.log("LOGIN ERR: ", err?.message);
-          });
-        //
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
-        console.log("LOGIN CODE: ", error?.code);
-        console.log("LOGIN ERR: ", error?.message);
+    try {
+      let resp = await signInUser(formValues.email, formValues.password);
+      setIsLoading(false);
+      onSnapshot(doc(db, "users", resp.user.uid), (doc) => {
+        dispatch(setUserData(doc.data()));
+        history.push("/admin/dashboard");
       });
+    } catch (error) {
+      setIsLoading(false);
+      if (error?.code === "auth/network-request-failed") {
+        enqueueSnackbar(`${"Check your internet connection!"}`, {
+          variant: "error",
+        });
+      }
+    }
+
+    // setPersistence(auth, browserSessionPersistence)
+    //   .then((re) => {
+
+    //   })
+    //   .catch((error) => {
+    //     // Handle Errors here.
+    //     // const errorCode = error.code;
+    //     // const errorMessage = error.message;
+    //     setIsLoading(false);
+    //     console.log("LOGIN CODE: ", error?.code);
+    //     console.log("LOGIN ERR: ", error?.message);
+    //   });
   };
 
   return (

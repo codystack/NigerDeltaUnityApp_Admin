@@ -15,9 +15,9 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress, Grid } from "@mui/material";
+import { CircularProgress, Grid, TextField } from "@mui/material";
 import { Typography } from "@mui/material";
-import RichText from "../../components/misc/richtext";
+import QuillEditor from "../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -77,9 +77,7 @@ const AddHistoryForm = (props) => {
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
   const [content, setContent] = React.useState(null);
-  const [isError, setIsError] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
@@ -210,28 +208,25 @@ const AddHistoryForm = (props) => {
           errorMessages={["Title is required"]}
         />
 
-        <RichText
-          value={content}
+        <QuillEditor
           setValue={setContent}
-          error={isError}
-          setError={setIsError}
-          setIsStartedFilling={setIsStartedFilling}
+          placeholder={"Type history here..."}
         />
+        <br />
 
-        <TextValidator
+        <TextField
           className={classes.mb}
           label="Summary"
           multiLine={true}
           rows={2}
-          rowsMax={2}
+          rowsMax={3}
           size="small"
           variant="outlined"
           value={formValues.summary}
           onChange={handleChange}
           name="summary"
           fullWidth
-          validators={["required"]}
-          errorMessages={["Brief summary is required"]}
+          required
         />
 
         <Button
