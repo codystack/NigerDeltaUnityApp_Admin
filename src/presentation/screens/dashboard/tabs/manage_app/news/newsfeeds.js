@@ -3,9 +3,7 @@ import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import { CardActionArea, Divider, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import IconButton from "@mui/material/IconButton";
@@ -96,10 +94,10 @@ const NewsItemCard = (props) => {
     body,
     date,
     category,
+    summary,
     item,
   } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
@@ -163,24 +161,6 @@ const NewsItemCard = (props) => {
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update News"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditNewsForm
-            setOpen={setOpen}
-            img={image}
-            title={title}
-            id={id}
-            authorName={authorName}
-            authorPhoto={authorPhoto}
-            body={body}
-            category={category}
-            date={date}
-          />
-        }
-      />
       <DeleteDialog
         open={openDelete}
         title="Delete News"
@@ -206,9 +186,24 @@ const NewsItemCard = (props) => {
           </div>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/dashboard/manage-app/news-feeds/edit",
+                  state: {
+                    id: id,
+                    img: image,
+                    title: title,
+                    summary: summary,
+                    authorName: authorName,
+                    authorPhoto: authorPhoto,
+                    body: body,
+                    category: category,
+                    date: date,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>
@@ -230,6 +225,7 @@ const NewsItemCard = (props) => {
                 category: item?.category,
                 image: item?.image,
                 body: item?.body,
+                summary: summary,
                 authorName: item?.authorName,
                 authorPhoto: item?.authorPhoto,
                 date: item?.createdAt,
@@ -288,12 +284,6 @@ const NewsFeeds = () => {
 
   return (
     <div>
-      {/* <CustomDialog
-        open={open}
-        title="Create NewsFeed"
-        handleClose={() => setOpen(false)}
-        bodyComponent={<AddNewsForm setOpen={setOpen} />}
-      /> */}
       <div className={classes.row}>
         <div className={classes.lhsRow}>
           <Button
@@ -335,6 +325,7 @@ const NewsFeeds = () => {
                   authorName={newsList[index]?.authorName}
                   authorPhoto={newsList[index]?.authorPhoto}
                   body={newsList[index]?.body}
+                  summary={newsList[index]?.summary}
                   category={newsList[index]?.category}
                 />
               </Grid>

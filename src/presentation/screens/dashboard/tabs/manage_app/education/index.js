@@ -31,11 +31,10 @@ import Paper from "@mui/material/Paper";
 import EduEditCategoryForm from "../../../../../forms/education/edit_category";
 import AddEducationForm from "../../../../../forms/education/add_education";
 import EduAddCategoryForm from "../../../../../forms/education/add_category";
-import EditEducationForm from "../../../../../forms/education/edit_education";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: 386,
+    height: 320,
     width: "100%",
   },
   row: {
@@ -92,7 +91,6 @@ const useStyles = makeStyles((theme) => ({
 const EducationCard = (props) => {
   const { id, image, name, category, url, description, item } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
@@ -104,7 +102,7 @@ const EducationCard = (props) => {
     deleteObject(fileRef)
       .then(async () => {
         try {
-          await deleteDoc(doc(db, "news", "" + id));
+          await deleteDoc(doc(db, "education", "" + id));
           enqueueSnackbar(`Item deleted successfully`, {
             variant: "success",
           });
@@ -151,22 +149,6 @@ const EducationCard = (props) => {
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update Education Listing"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditEducationForm
-            setOpen={setOpen}
-            img={image}
-            id={id}
-            name={name}
-            category={category}
-            url={url}
-            description={description}
-          />
-        }
-      />
       <DeleteDialog
         open={openDelete}
         title="Delete Education Listing"
@@ -177,9 +159,21 @@ const EducationCard = (props) => {
         <div className={classes.rowHeader}>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/dashboard/manage-app/education/edit",
+                  state: {
+                    url: url,
+                    id: item?.id,
+                    image: image,
+                    title: item?.title,
+                    category: category,
+                    description: description,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>
@@ -193,26 +187,27 @@ const EducationCard = (props) => {
           </div>
         </div>
         <CardActionArea
-        //   onClick={() =>
-        //     history.push({
-        //       pathname: "/admin/dashboard/manage-app/education:" + item?.id,
-        //       state: {
-        //         id: item?.id,
-        //         name: item?.name,
-        //         category: item?.category,
-        //         image: item?.image,
-        //         description: item?.description,
-        //         url: item?.url,
-        //         createdAt: item?.createdAt,
-        //         updatedAt: item?.updatedAt,
-        //       },
-        //     })
-        //   }
+          onClick={() =>
+            history.push({
+              pathname: "/admin/dashboard/manage-app/education:" + item?.id,
+              state: {
+                id: item?.id,
+                url: item?.url,
+                title: item?.title,
+                image: image,
+                category: item?.category,
+                createdAt: item?.createdAt,
+                updatedAt: item?.updatedAt,
+                description: item?.description,
+              },
+            })
+          }
         >
           <CardMedia image={image} className={classes.cardMedia} />
           <Divider />
           <div className={classes.row}>
             <Typography
+              pt={2}
               fontSize={16}
               color="black"
               paddingLeft={1}
@@ -358,7 +353,7 @@ const Education = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "education-categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -369,7 +364,7 @@ const Education = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "education"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const edu = [];
       querySnapshot.forEach((doc) => {
         edu.push(doc.data());
@@ -468,22 +463,22 @@ const Education = () => {
                 sm={6}
                 md={6}
                 key={index}
-                onClick={() =>
-                  history.push({
-                    pathname:
-                      "/admin/dashboard/manage-app/education:" + item?.id,
-                    state: {
-                      name: educationList[index]?.name,
-                      url: educationList[index]?.url,
-                      image: educationList[index]?.image,
-                      description: educationList[index]?.description,
-                      createdAt: educationList[index]?.createdAt,
-                      updatedAt: educationList[index]?.updatedAt,
-                      category: educationList[index]?.category,
-                      id: educationList[index]?.id,
-                    },
-                  })
-                }
+                // onClick={() =>
+                //   history.push({
+                //     pathname:
+                //       "/admin/dashboard/manage-app/education:" + item?.id,
+                //     state: {
+                //       name: educationList[index]?.name,
+                //       url: educationList[index]?.url,
+                //       image: educationList[index]?.image,
+                //       description: educationList[index]?.description,
+                //       createdAt: educationList[index]?.createdAt,
+                //       updatedAt: educationList[index]?.updatedAt,
+                //       category: educationList[index]?.category,
+                //       id: educationList[index]?.id,
+                //     },
+                //   })
+                // }
               >
                 <EducationCard
                   item={item}

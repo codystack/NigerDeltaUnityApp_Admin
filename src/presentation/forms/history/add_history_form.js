@@ -18,6 +18,9 @@ import { Box } from "@mui/system";
 import { CircularProgress, Grid, TextField } from "@mui/material";
 import { Typography } from "@mui/material";
 import QuillEditor from "../../components/misc/richtext/quill";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import { useHistory } from "react-router-dom";
+import placeholder from "../../../assets/images/placeholder.png";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -62,7 +65,7 @@ const CircularProgressWithLabel = (props) => {
 
 const AddHistoryForm = (props) => {
   const classes = useStyles();
-  let { setOpen } = props;
+  const history = useHistory();
   const [formValues, setFormValues] = React.useState({
     title: "",
     image: "",
@@ -84,7 +87,14 @@ const AddHistoryForm = (props) => {
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+      } catch (e) {}
+
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,
@@ -109,7 +119,7 @@ const AddHistoryForm = (props) => {
       },
       (error) => {
         setIsUploading(false);
-        console.log(error);
+        // console.log(error);
         enqueueSnackbar(`${error.message}`, { variant: "error" });
       },
       () => {
@@ -126,11 +136,11 @@ const AddHistoryForm = (props) => {
             updatedAt: timeNow,
           })
             .then((res) => {
-              setOpen(false);
               setIsLoading(false);
               enqueueSnackbar(`History added successfully`, {
                 variant: "success",
               });
+              history.goBack();
             })
             .catch((error) => {
               setIsLoading(false);
@@ -161,6 +171,25 @@ const AddHistoryForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={createHistory}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            variant="contained"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Create History
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator

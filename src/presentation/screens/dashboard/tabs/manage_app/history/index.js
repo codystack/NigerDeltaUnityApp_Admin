@@ -3,7 +3,6 @@ import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import { CardActionArea, Divider, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -26,8 +25,6 @@ import { useSnackbar } from "notistack";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import AddHistoryForm from "../../../../../forms/history/add_history_form";
-import EditHistoryForm from "../../../../../forms/history/update_history_form";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -86,14 +83,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const HistoryItemCard = (props) => {
-  const { image, title, id, body, summary, item } = props;
+  const { image, title, id, item } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
 
-  const deleteNews = () => {
+  const deleteHistory = () => {
     setOpenDelete(false);
     const fileRef = ref(storage, "history/" + id);
 
@@ -140,7 +136,7 @@ const HistoryItemCard = (props) => {
           size="small"
           variant="contained"
           color="error"
-          onClick={deleteNews}
+          onClick={deleteHistory}
         >
           Delete
         </Button>
@@ -150,21 +146,6 @@ const HistoryItemCard = (props) => {
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update History"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditHistoryForm
-            setOpen={setOpen}
-            img={image}
-            title={title}
-            id={id}
-            body={body}
-            summary={summary}
-          />
-        }
-      />
       <DeleteDialog
         open={openDelete}
         title="Delete History"
@@ -175,9 +156,21 @@ const HistoryItemCard = (props) => {
         <div className={classes.rowHeader}>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname: "/admin/dashboard/manage-app/history/edit",
+                  state: {
+                    title: item?.title,
+                    image: item?.image,
+                    body: item?.body,
+                    summary: item?.summary,
+                    date: item?.createdAt,
+                    id: item?.id,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>
@@ -207,6 +200,7 @@ const HistoryItemCard = (props) => {
         >
           <CardMedia image={image} className={classes.cardMedia} />
           <Divider />
+          <br />
           <div className={classes.row}>
             <Typography
               fontSize={16}
@@ -227,12 +221,11 @@ const HistoryItemCard = (props) => {
 const History = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [open, setOpen] = React.useState(false);
   const [historyList, setHistoryList] = React.useState(null);
 
   React.useEffect(() => {
     const q = query(collection(db, "history"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const hist = [];
       querySnapshot.forEach((doc) => {
         let dat = doc.data();
@@ -244,12 +237,6 @@ const History = () => {
 
   return (
     <div>
-      <CustomDialog
-        open={open}
-        title="Add History"
-        handleClose={() => setOpen(false)}
-        bodyComponent={<AddHistoryForm setOpen={setOpen} />}
-      />
       <div className={classes.row}>
         <div className={classes.lhsRow}>
           <Button
@@ -266,7 +253,9 @@ const History = () => {
           startIcon={<Add />}
           color="primary"
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={() =>
+            history.push("/admin/dashboard/manage-app/history/create")
+          }
         >
           Add History
         </Button>

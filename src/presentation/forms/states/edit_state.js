@@ -19,6 +19,7 @@ import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
+import placeholder from "../../../assets/images/placeholder.png";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -65,9 +66,9 @@ const EditStateForm = (props) => {
   const classes = useStyles();
   let { setOpen, id, name, slogan, img } = props;
   const [formValues, setFormValues] = React.useState({
-    name: " ",
+    name: name,
     image: "",
-    slogan: " ",
+    slogan: slogan,
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -81,7 +82,13 @@ const EditStateForm = (props) => {
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+      } catch (e) {}
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,
@@ -145,10 +152,10 @@ const EditStateForm = (props) => {
 
   const updateState = async (e) => {
     setIsLoading(true);
-    setFormValues({
-      name: formValues.name ? formValues.name : name,
-      slogan: formValues.slogan ? formValues.slogan : slogan,
-    });
+    // setFormValues({
+    //   name: formValues.name ? formValues.name : name,
+    //   slogan: formValues.slogan ? formValues.slogan : slogan,
+    // });
     if (!previewImage) {
       //No image is changed. So update all text
       const timeNow = new Date();
@@ -235,13 +242,7 @@ const EditStateForm = (props) => {
           label="Name"
           size="small"
           variant="outlined"
-          value={
-            formValues.name === " "
-              ? name
-              : !formValues.name
-              ? ""
-              : formValues.name
-          }
+          value={formValues.name}
           onChange={handleChange}
           name="name"
           fullWidth
@@ -255,13 +256,7 @@ const EditStateForm = (props) => {
           label="State slogan"
           size="small"
           variant="outlined"
-          value={
-            formValues.slogan === " "
-              ? slogan
-              : !formValues.slogan
-              ? ""
-              : formValues.slogan
-          }
+          value={formValues.slogan}
           onChange={handleChange}
           name="slogan"
           fullWidth

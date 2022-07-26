@@ -4,9 +4,7 @@ import { withRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { IconButton } from "@mui/material";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import EditNewsForm from "../../../../../forms/news/update_news_form";
 import { useSnackbar } from "notistack";
 import {
   deleteDoc,
@@ -76,7 +74,6 @@ const NewsItem = (props) => {
   const { history, location } = props;
   const classes = useStyles();
 
-  const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -143,25 +140,6 @@ const NewsItem = (props) => {
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update News"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditNewsForm
-            setOpen={setOpen}
-            img={location?.state?.image}
-            title={location?.state?.title}
-            id={location?.state?.id}
-            subTitle={location?.state?.subTitle}
-            authorName={location?.state?.authorName}
-            authorPhoto={location?.state?.authorPhoto}
-            body={location?.state?.body}
-            category={location?.state?.category}
-            date={location?.state?.date}
-          />
-        }
-      />
       <DeleteDialog
         open={openDelete}
         title="Delete News"
@@ -188,9 +166,24 @@ const NewsItem = (props) => {
 
         <div className={classes.lhsRow}>
           <IconButton
-            aria-label="delete"
+            aria-label="edit"
             color="primary"
-            onClick={() => setOpen(true)}
+            onClick={() =>
+              history.push({
+                pathname: "/admin/dashboard/manage-app/news-feeds/edit",
+                state: {
+                  id: location?.state?.id,
+                  img: location?.state?.image,
+                  title: location?.state?.title,
+                  summary: location?.state?.summary,
+                  authorName: location?.state?.authorName,
+                  authorPhoto: location?.state?.authorPhoto,
+                  body: location?.state?.body,
+                  category: location?.state?.category,
+                  date: location?.state?.date,
+                },
+              })
+            }
           >
             <Edit />
           </IconButton>

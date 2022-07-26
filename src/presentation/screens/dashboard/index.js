@@ -47,6 +47,11 @@ import AddProjectForm from "../../forms/projects/add_project_form";
 import EditProjectForm from "../../forms/projects/update_project_form";
 import AdsManager from "./tabs/manage_app/ads";
 import CreateAdsForm from "../../forms/ads/add_advert_form";
+import EditNewsForm from "../../forms/news/update_news_form";
+import AddHistoryForm from "../../forms/history/add_history_form";
+import EditHistoryForm from "../../forms/history/update_history_form";
+import EducationDetail from "./tabs/manage_app/education/education_detail";
+import EditEducationForm from "../../forms/education/edit_education";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -344,6 +349,13 @@ function Dashboard(props) {
               <AddNewsForm />
             </Route>
 
+            <Route
+              path="/admin/dashboard/manage-app/news-feeds/edit"
+              exact={true}
+            >
+              <EditNewsForm />
+            </Route>
+
             <Route path="/admin/dashboard/manage-app/projects" exact={true}>
               <Projects />
             </Route>
@@ -377,6 +389,18 @@ function Dashboard(props) {
             <Route path="/admin/dashboard/manage-app/history" exact={true}>
               <History />
             </Route>
+            <Route
+              path="/admin/dashboard/manage-app/history/create"
+              exact={true}
+            >
+              <AddHistoryForm />
+            </Route>
+            <Route path="/admin/dashboard/manage-app/history/edit" exact={true}>
+              <EditHistoryForm />
+            </Route>
+            <Route path="/admin/dashboard/manage-app/history:id" exact={true}>
+              <HistoryDetail />
+            </Route>
 
             <Route path="/admin/dashboard/manage-app/vendors" exact={true}>
               <Directories />
@@ -393,12 +417,17 @@ function Dashboard(props) {
               <VendorItem />
             </Route>
 
-            <Route path="/admin/dashboard/manage-app/history:id" exact={true}>
-              <HistoryDetail />
-            </Route>
-
             <Route path="/admin/dashboard/manage-app/education" exact={true}>
               <Education />
+            </Route>
+            <Route path="/admin/dashboard/manage-app/education:id" exact={true}>
+              <EducationDetail />
+            </Route>
+            <Route
+              path="/admin/dashboard/manage-app/education/edit"
+              exact={true}
+            >
+              <EditEducationForm />
             </Route>
 
             <Route

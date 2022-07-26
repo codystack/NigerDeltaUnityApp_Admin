@@ -4,7 +4,6 @@ import {
   TextValidator,
   SelectValidator,
 } from "react-material-ui-form-validator";
-import Avatar from "@mui/material/Avatar";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import {
@@ -22,13 +21,15 @@ import {
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
-import { Box } from "@mui/system";
-import { Checkbox, CircularProgress } from "@mui/material";
-import { Typography } from "@mui/material";
-import { Grid } from "@mui/material";
-import { MenuItem } from "@mui/material";
-import { CameraAlt } from "@mui/icons-material";
+import Box from "@mui/system/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
 import Edit from "@mui/icons-material/Edit";
+import { useHistory, useLocation } from "react-router-dom";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import placeholder from "../../../assets/images/placeholder.png";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -71,9 +72,11 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const EditEducationForm = (props) => {
+const EditEducationForm = () => {
+  const location = useLocation();
+  const history = useHistory();
   const classes = useStyles();
-  let { setOpen, id, title, category, url, description, img } = props;
+  let { id, title, category, url, description, image } = location?.state;
 
   const [formValues, setFormValues] = React.useState({
     title: title,
@@ -87,7 +90,8 @@ const EditEducationForm = (props) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const [previewImage, setPreviewImage] = React.useState("");
+  const [previewImage, setPreviewImage] = React.useState(null);
+  const [dummyImage, setDummyImage] = React.useState(image);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -95,7 +99,7 @@ const EditEducationForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "education-categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -109,7 +113,15 @@ const EditEducationForm = (props) => {
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+          setDummyImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+          setDummyImage(placeholder);
+        }
+      } catch (e) {}
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,
@@ -154,11 +166,11 @@ const EditEducationForm = (props) => {
               updatedAt: timeNow,
               image: downloadURL,
             });
-            setOpen(false);
             setIsLoading(false);
             enqueueSnackbar(`Data updated successfully`, {
               variant: "success",
             });
+            history.goBack();
           } catch (error) {
             setIsLoading(false);
             enqueueSnackbar(
@@ -174,9 +186,12 @@ const EditEducationForm = (props) => {
   };
 
   const updateEducation = async (e) => {
+    console.log("HELLOION:::");
     setIsLoading(true);
+    e.preventDefault();
 
     if (!previewImage) {
+      console.log("HJGG");
       //No image is changed. So update all text
       const timeNow = new Date();
       try {
@@ -188,11 +203,11 @@ const EditEducationForm = (props) => {
           category: formValues.category,
           updatedAt: timeNow,
         });
-        setOpen(false);
         setIsLoading(false);
         enqueueSnackbar(`Data updated successfully`, {
           variant: "success",
         });
+        history.goBack();
       } catch (error) {
         setIsLoading(false);
         enqueueSnackbar(`${error?.message || "Check internet connection"}`, {
@@ -200,6 +215,7 @@ const EditEducationForm = (props) => {
         });
       }
     } else if (previewImage) {
+      console.log("YYYY");
       //Change on the featured image and all texts
       const fileRef = ref(storage, "education/" + id);
 
@@ -231,7 +247,27 @@ const EditEducationForm = (props) => {
           <div />
         )}
       </Backdrop>
+
       <ValidatorForm onSubmit={updateEducation}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            variant="contained"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Update Education
+          </Typography>
+        </Box>
         <TextValidator
           id="image"
           size="small"
@@ -254,9 +290,9 @@ const EditEducationForm = (props) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            height: 144,
-            width: 420,
-            backgroundImage: "url(" + previewImage + ")",
+            height: 256,
+            width: "100%",
+            backgroundImage: "url(" + dummyImage + ")",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             marginBottom: 24,
@@ -342,7 +378,6 @@ const EditEducationForm = (props) => {
           fullWidth
           multiline
           rows={4}
-          rowsMax={5}
           placeholder="Briefly describe here..."
           name="description"
           label="Description"
@@ -359,7 +394,7 @@ const EditEducationForm = (props) => {
           disabled={isLoading || isUploading}
           fullWidth
         >
-          Save
+          Update Now
         </Button>
       </ValidatorForm>
     </div>

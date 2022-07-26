@@ -23,11 +23,13 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, TextField } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
-import RichText from "../../components/misc/richtext/";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import { useHistory, useLocation } from "react-router-dom";
+import QuillEditable from "../../components/misc/richtext/edit_quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -70,7 +72,9 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const EditNewsForm = (props) => {
+const EditNewsForm = () => {
+  const location = useLocation();
+  const history = useHistory();
   const classes = useStyles();
   let {
     setOpen,
@@ -82,7 +86,8 @@ const EditNewsForm = (props) => {
     summary,
     authorName,
     authorPhoto,
-  } = props;
+  } = location?.state;
+
   const [formValues, setFormValues] = React.useState({
     title: title,
     image: "",
@@ -100,10 +105,8 @@ const EditNewsForm = (props) => {
   const [previewAuthor, setPreviewAuthor] = React.useState("");
 
   const [newsBody, setNewsBody] = React.useState(body);
-  const [isError, setIsError] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [categoriesList, setCategoriesList] = React.useState(null);
-  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
@@ -260,11 +263,11 @@ const EditNewsForm = (props) => {
           summary: formValues.summary,
           updatedAt: timeNow,
         });
-        setOpen(false);
         setIsLoading(false);
         enqueueSnackbar(`News title updated successfully`, {
           variant: "success",
         });
+        history.goBack();
       } catch (error) {
         setIsLoading(false);
         enqueueSnackbar(`${error?.message}`, {
@@ -373,7 +376,7 @@ const EditNewsForm = (props) => {
                                   await updateDoc(mRef, {
                                     authorPhoto: download,
                                   });
-                                  setOpen(false);
+
                                   setIsLoading(false);
                                   enqueueSnackbar(
                                     `Newsfeed updated successfully`,
@@ -381,6 +384,7 @@ const EditNewsForm = (props) => {
                                       variant: "success",
                                     }
                                   );
+                                  history.goBack();
                                 } catch (error) {
                                   setIsLoading(false);
                                   enqueueSnackbar(`${error?.message}`, {
@@ -422,6 +426,26 @@ const EditNewsForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updateNews}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            disableElevation
+            variant="contained"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Edit News
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator
@@ -474,33 +498,23 @@ const EditNewsForm = (props) => {
           label="News title"
           size="small"
           variant="outlined"
-          value={
-            formValues.title === " "
-              ? title
-              : !formValues.title
-              ? ""
-              : formValues.title
-          }
+          value={formValues.title}
           onChange={handleChange}
           name="title"
           fullWidth
           validators={["required"]}
           errorMessages={["News title is required"]}
         />
-        <RichText
-          value={newsBody}
-          setValue={setNewsBody}
-          error={isError}
-          setError={setIsError}
-          setIsStartedFilling={setIsStartedFilling}
-        />
+
+        <QuillEditable setValue={setNewsBody} value={newsBody} />
         <br />
-        <TextValidator
+        <TextField
           className={classes.mb}
           id="summary"
           multiLine
           rows={2}
-          rowsMax={2}
+          maxRows={2}
+          minRows={2}
           label="News summary"
           placeholder="Type summary here..."
           size="small"
@@ -509,8 +523,7 @@ const EditNewsForm = (props) => {
           onChange={handleChange}
           name="summary"
           fullWidth
-          validators={["required"]}
-          errorMessages={["News summary is required"]}
+          required
         />
         <Grid container spacing={1} padding={1} marginBottom={1}>
           <Grid item xs={12} sm={6} md={7}>
@@ -534,13 +547,7 @@ const EditNewsForm = (props) => {
                 label="Author's name"
                 size="small"
                 variant="outlined"
-                value={
-                  formValues.authorName === " "
-                    ? authorName
-                    : !formValues.authorName
-                    ? ""
-                    : formValues.authorName
-                }
+                value={formValues.authorName}
                 onChange={handleChange}
                 name="authorName"
                 fullWidth

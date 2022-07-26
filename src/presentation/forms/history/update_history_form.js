@@ -19,7 +19,10 @@ import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
-import RichText from "../../components/misc/richtext/";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import { useHistory, useLocation } from "react-router-dom";
+import placeholder from "../../../assets/images/placeholder.png";
+import QuillEditable from "../../components/misc/richtext/edit_quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -62,9 +65,11 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const EditHistoryForm = (props) => {
+const EditHistoryForm = () => {
+  const location = useLocation();
+  const history = useHistory();
   const classes = useStyles();
-  let { setOpen, id, title, img, body, summary } = props;
+  let { id, title, image, body, summary } = location?.state;
   const [formValues, setFormValues] = React.useState({
     title: title,
     image: "",
@@ -77,17 +82,21 @@ const EditHistoryForm = (props) => {
   const [previewImage, setPreviewImage] = React.useState("");
 
   const [content, setContent] = React.useState(body);
-  const [isError, setIsError] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  //   const [categoriesList, setCategoriesList] = React.useState(null);
-  const [isStartedFilling, setIsStartedFilling] = React.useState(false);
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+      } catch (e) {}
+
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,
@@ -128,11 +137,11 @@ const EditHistoryForm = (props) => {
               updatedAt: timeNow,
               image: downloadURL,
             });
-            setOpen(false);
             setIsLoading(false);
             enqueueSnackbar(`History updated successfully`, {
               variant: "success",
             });
+            history.goBack();
           } catch (error) {
             setIsLoading(false);
             enqueueSnackbar(
@@ -149,11 +158,7 @@ const EditHistoryForm = (props) => {
 
   const updateHistory = async (e) => {
     setIsLoading(true);
-    setFormValues({
-      title: formValues.title ? formValues.title : title,
-      body: content,
-      summary: formValues.summary ? formValues.summary : summary,
-    });
+
     if (!previewImage) {
       //No image is changed. So update all text
       const timeNow = new Date();
@@ -165,11 +170,11 @@ const EditHistoryForm = (props) => {
           summary: formValues.summary,
           updatedAt: timeNow,
         });
-        setOpen(false);
         setIsLoading(false);
         enqueueSnackbar(`History updated successfully`, {
           variant: "success",
         });
+        history.goBack();
       } catch (error) {
         setIsLoading(false);
         enqueueSnackbar(`${error?.message}`, {
@@ -187,9 +192,12 @@ const EditHistoryForm = (props) => {
         })
         .catch((error) => {
           setIsLoading(false);
-          enqueueSnackbar(`${error?.message}`, {
-            variant: "error",
-          });
+          enqueueSnackbar(
+            `${error?.message || "Check your internet connection"}`,
+            {
+              variant: "error",
+            }
+          );
         });
     }
   };
@@ -209,6 +217,26 @@ const EditHistoryForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updateHistory}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            disableElevation
+            variant="contained"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Update History
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator
@@ -231,7 +259,7 @@ const EditHistoryForm = (props) => {
               <Avatar
                 variant="rounded"
                 alt="Passport"
-                src={previewImage ? previewImage : img}
+                src={previewImage ? previewImage : image}
                 className={classes.image}
               />
             </div>
@@ -252,13 +280,8 @@ const EditHistoryForm = (props) => {
           errorMessages={["Title is required"]}
         />
 
-        <RichText
-          value={content}
-          setValue={setContent}
-          error={isError}
-          setError={setIsError}
-          setIsStartedFilling={setIsStartedFilling}
-        />
+        <QuillEditable setValue={setContent} value={content} />
+        <br />
 
         <TextValidator
           className={classes.mb}

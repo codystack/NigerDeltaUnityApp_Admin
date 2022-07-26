@@ -66,21 +66,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const HistoryDetail = (props) => {
+const EducationDetail = (props) => {
   const { history, location } = props;
   const classes = useStyles();
 
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const deleteNews = () => {
+  const deleteEducation = () => {
     setOpenDelete(false);
-    const fileRef = ref(storage, "history/" + location?.state?.id);
+    const fileRef = ref(storage, "education/" + location?.state?.id);
 
     deleteObject(fileRef)
       .then(async () => {
         try {
-          await deleteDoc(doc(db, "history", "" + location?.state?.id));
+          await deleteDoc(doc(db, "education", "" + location?.state?.id));
           enqueueSnackbar(`Item deleted successfully`, {
             variant: "success",
           });
@@ -103,7 +103,7 @@ const HistoryDetail = (props) => {
   const deleteBody = (
     <div>
       <Typography variant="body2" gutterBottom>
-        {`Are you sure you want to delete ${location?.state?.title} ?`}
+        {`Are you sure you want to delete ${location?.state?.title}?`}
       </Typography>
       <br />
       <div className={classes.subRow}>
@@ -120,7 +120,7 @@ const HistoryDetail = (props) => {
           size="small"
           variant="contained"
           color="error"
-          onClick={deleteNews}
+          onClick={deleteEducation}
         >
           Delete
         </Button>
@@ -136,7 +136,7 @@ const HistoryDetail = (props) => {
     <>
       <DeleteDialog
         open={openDelete}
-        title="Delete History"
+        title="Delete Education"
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
       />
@@ -154,14 +154,16 @@ const HistoryDetail = (props) => {
             color="primary"
             onClick={() =>
               history.push({
-                pathname: "/admin/dashboard/manage-app/history/edit",
+                pathname: "/admin/dashboard/manage-app/education/edit",
                 state: {
-                  id: location?.state?.id,
-                  body: location?.state?.body,
-                  date: location?.state?.date,
-                  image: location?.state?.image,
-                  title: location?.state?.title,
-                  summary: location?.state?.summary,
+                  id: location.state?.id,
+                  url: location.state?.url,
+                  image: location.state.image,
+                  title: location.state.title,
+                  category: location.state?.category,
+                  createdAt: location.state?.createdAt,
+                  updatedAt: location.state?.updatedAt,
+                  description: location.state?.description,
                 },
               })
             }
@@ -211,4 +213,4 @@ const HistoryDetail = (props) => {
   );
 };
 
-export default withRouter(HistoryDetail);
+export default withRouter(EducationDetail);
