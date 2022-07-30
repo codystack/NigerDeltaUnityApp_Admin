@@ -436,7 +436,7 @@ const EditNewsForm = () => {
         >
           <Button
             disableElevation
-            variant="contained"
+            variant="text"
             startIcon={<ArrowBackIosNew />}
             onClick={() => history.goBack()}
           >

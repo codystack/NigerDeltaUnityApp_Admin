@@ -2,15 +2,13 @@ import React from "react";
 import { makeStyles } from "@mui/styles";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import {
-  ArrowBackIosNew,
-  Edit,
-  Email,
-  Facebook,
-  Instagram,
-  Phone,
-  Web,
-} from "@mui/icons-material";
+import Public from "@mui/icons-material/Public";
+import Phone from "@mui/icons-material/Phone";
+import Instagram from "@mui/icons-material/Instagram";
+import Facebook from "@mui/icons-material/Facebook";
+import Email from "@mui/icons-material/Email";
+import Edit from "@mui/icons-material/Edit";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
 import image from "../../../../../../assets/images/handshake.jpeg";
 import Grid from "@mui/material/Grid";
 import { useHistory } from "react-router-dom";
@@ -121,7 +119,7 @@ const ContactUs = () => {
               </div>
 
               <div className={classes.rowStart}>
-                <Web fontSize="large" />
+                <Public fontSize="large" />
                 <Typography sx={{ ml: 2 }} gutterBottom align="justify">
                   {contactsData?.website}
                 </Typography>

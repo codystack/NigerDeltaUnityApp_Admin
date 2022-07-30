@@ -163,7 +163,7 @@ const ProductItemCard = (props) => {
       />
       <DeleteDialog
         open={openDelete}
-        title="Delete Product"
+        title="Delete Product/Service"
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
       />
@@ -180,9 +180,25 @@ const ProductItemCard = (props) => {
           </div>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname:
+                    "/admin/dashboard/manage-app/vendors:" +
+                    id +
+                    "/products:" +
+                    item?.id +
+                    "/edit",
+                  state: {
+                    id: item?.id,
+                    name: item?.name,
+                    image: item?.image,
+                    desc: item?.description,
+                    price: item?.price,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>

@@ -221,7 +221,7 @@ const State = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "states"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const state = [];
       querySnapshot.forEach((doc) => {
         state.push(doc.data());

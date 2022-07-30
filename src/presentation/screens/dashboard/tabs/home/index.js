@@ -1,8 +1,6 @@
 import React from "react";
 import Card from "@mui/material/Card";
-import { useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import { Toolbar } from "@mui/material";
 import {
   onSnapshot,
   query,
@@ -10,217 +8,121 @@ import {
   collection,
   db,
 } from "../../../../../data/firebase";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridHeader,
-  GridFilterToolbarButton,
-  GridToolbarExport,
-} from "@mui/x-data-grid";
-// import GridColumnsToolbarButton
-import Avatar from "@mui/material/Avatar";
-import Paper from "@mui/material/Paper";
+
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
-import CustomNoRowsOverlay from "../../../../components/misc/placeholder/custom_no_data";
+import { Box } from "@mui/system";
+import { useSelector } from "react-redux";
+import OSPie from "../../../../components/misc/charts/pie";
+import UsersTable from "../../../../components/dashboard/table/user";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    height: "100vh",
-  },
-  button: {
-    textTransform: "none",
-    fontSize: 11,
-  },
-  row: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-}));
-
-const CustomToolbar = () => {
-  const theme = useTheme();
-
+const CardItem = (props) => {
+  let { title, value, ml, mr } = props;
   return (
-    <GridToolbarContainer
-      color="secondary"
-      style={{
-        display: "flex",
-        padding: 16,
-      }}
-    >
-      <Paper style={{ padding: 6, borderRadius: 10 }}>
-        <GridHeader />
-      </Paper>
-      {/* <Paper
-        style={{ padding: 6, borderRadius: 10, marginLeft: 5, marginRight: 5 }}
+    <Card elevation={2} sx={{ width: 175, mr: mr, ml: ml }}>
+      <Box
+        paddingX={4}
+        paddingY={5}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        <GridFilterToolbarButton />
-      </Paper> */}
-      <Paper
-        style={{
-          alignSelf: "flex-end",
-          padding: 6,
-          marginLeft: "auto",
-          borderRadius: 10,
-        }}
-      >
-        <GridToolbarExport />
-      </Paper>
-    </GridToolbarContainer>
+        <Typography variant="h6" gutterBottom fontWeight={"600"}>
+          {value}
+        </Typography>
+        <Typography>{title}</Typography>
+      </Box>
+    </Card>
   );
 };
 
 const HomePage = () => {
-  const classes = useStyles();
-
-  const [projectsList, setProjectsList] = React.useState(null);
-  const [newsList, setNewsList] = React.useState(null);
-  const [categoriesList, setCategoriesList] = React.useState(null);
+  // const classes = useStyles();
   const [usersList, setUsersList] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [androidUsers, setAndroidUsers] = React.useState(null);
+  const [iosUsers, setiOSUsers] = React.useState(null);
+  // const [isLoading, setIsLoading] = React.useState(false);
+
+  const { newsData, statesData, projectsData, vendorsData, adsData } =
+    useSelector((state) => state.cms);
+
+  // const { userData } = useSelector((state) => state.user);
 
   React.useEffect(() => {
-    const q = query(collection(db, "categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const categories = [];
+    const q = query(collection(db, "users"), where("userType", "==", "public"));
+    onSnapshot(q, (querySnapshot) => {
+      const usrs = [];
+      const android = [];
+      const ios = [];
       querySnapshot.forEach((doc) => {
-        categories.push(doc.data());
+        usrs.push(doc.data());
+        console.log("USER DATA:::", doc.data());
+        console.log("USET TYOE::", doc.get("osPlatform"));
+        if (doc.get("osPlatform") === "android") {
+          android.push(doc.data());
+        } else if ("osPlatform" === "ios") {
+          ios.push(doc.data());
+        }
       });
-      setCategoriesList(categories);
+      setiOSUsers(ios);
+      setAndroidUsers(android);
+      setUsersList(usrs.slice(0, 5));
     });
     return () => {
-      setCategoriesList(null);
+      setUsersList([]);
     };
   }, []);
-
-  React.useEffect(() => {
-    const q = query(collection(db, "news"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const news = [];
-      querySnapshot.forEach((doc) => {
-        news.push(doc.data());
-      });
-      setNewsList(news);
-    });
-    return () => {
-      setNewsList(null);
-    };
-  }, []);
-
-  React.useEffect(() => {
-    const q = query(collection(db, "projects"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const proj = [];
-      querySnapshot.forEach((doc) => {
-        proj.push(doc.data());
-      });
-      setProjectsList(proj);
-    });
-    return () => {
-      setProjectsList(null);
-    };
-  }, []);
-
-  // React.useEffect(() => {
-  //   const q = query(collection(db, "users"), where("userType", "==", "public"));
-  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //     const usrs = [];
-  //     querySnapshot.forEach((doc) => {
-  //       usrs.push(doc.data());
-  //     });
-  //     setUsersList(usrs.slice(0, 5));
-  //   });
-  //   return () => {
-  //     setUsersList([]);
-  //   };
-  // }, []);
-
-  // if (usersList) {
-  //   console.log("Filtered: ", usersList);
-  // }
-
-  const columns = [
-    {
-      field: "photo",
-      headerName: "Image",
-      width: 75,
-      renderCell: (params) => (
-        <Avatar alt="Profile Picture" src={params.value} />
-      ),
-    },
-    {
-      field: "fullName",
-      headerName: "Full name",
-      description: "This column has a value getter and is not sortable.",
-      sortable: false,
-      width: 180,
-      valueGetter: (params) =>
-        `${params.row.firstname || ""} ${params.row.lastname || ""}`,
-    },
-    {
-      field: "email",
-      headerName: "Email Address",
-      width: 110,
-      editable: true,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
-      width: 110,
-      editable: true,
-    },
-  ];
 
   return (
     <div>
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="stretch"
+        alignItems="center"
+        width="100%"
+      >
+        <CardItem ml={0} mr={1} title="News Feeds" value={newsData?.length} />
+        <CardItem ml={1} mr={1} title="Projects" value={projectsData?.length} />
+        <CardItem ml={1} mr={1} title="States" value={statesData?.length} />
+        <CardItem ml={1} mr={1} title="Vendors" value={vendorsData?.length} />
+        <CardItem ml={1} mr={0} title="Ads" value={adsData?.length} />
+        {/* <CardItem title="Ads" value={statesData?.length} /> */}
+      </Box>
+      <Toolbar />
       <Grid container spacing={3}>
         <Grid item xs={12} sm={7} md={7}>
           <div style={{ display: "flex", height: "100%", padding: 4 }}>
             <div style={{ flexGrow: 1 }}>
               {usersList && (
-                <DataGrid
-                  rows={usersList}
-                  columns={columns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5]}
-                  checkboxSelection
-                  disableSelectionOnClick
-                  components={{
-                    NoRowsOverlay: CustomNoRowsOverlay,
-                    Toolbar: CustomToolbar,
-                  }}
-                />
+                <UsersTable />
+                // <DataGrid
+                //   rows={usersList}
+                //   columns={columns}
+                //   pageSize={5}
+                //   rowsPerPageOptions={[5]}
+                //   checkboxSelection
+                //   disableSelectionOnClick
+                //   components={{
+                //     NoRowsOverlay: CustomNoRowsOverlay,
+                //     Toolbar: CustomToolbar,
+                //   }}
+                // />
               )}
             </div>
           </div>
         </Grid>
 
         <Grid item xs={12} sm={5} md={5}>
-          <Card sx={{ mb: 3, mt: 3 }}>
-            <div className={classes.row} style={{ padding: 10 }}>
-              <Typography>Total categories</Typography>
-              <Typography>{categoriesList?.length}</Typography>
-            </div>
-            <Divider color="primary" />
-            <div className={classes.row} style={{ padding: 10 }}>
-              <Typography>Total news feeds</Typography>
-              <Typography>{newsList?.length}</Typography>
-            </div>
-            <Divider color="primary" />
-            <div className={classes.row} style={{ padding: 10 }}>
-              <Typography>Total projects</Typography>
-              <Typography>{projectsList?.length}</Typography>
-            </div>
-            <Divider color="primary" />
-            <div className={classes.row} style={{ padding: 10 }}>
-              <Typography>Total vendors</Typography>
-              <Typography>{0}</Typography>
-            </div>
+          <Card elevation={2}>
+            <OSPie
+              sampleData={[
+                ["Android", 100 - androidUsers?.length],
+                ["iOS", iosUsers?.length],
+                ["Others", 30],
+              ]}
+            />
           </Card>
         </Grid>
       </Grid>

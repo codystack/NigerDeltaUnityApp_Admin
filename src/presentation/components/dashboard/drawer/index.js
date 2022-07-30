@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 const DrawerContent = (props) => {
   const classes = useStyles();
-  const { mobileOpen, setMobileOpen } = props;
+  // const { mobileOpen, setMobileOpen } = props;
   const location = useLocation();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   //   const { userStatus, userData } = useSelector((state) => state.user);

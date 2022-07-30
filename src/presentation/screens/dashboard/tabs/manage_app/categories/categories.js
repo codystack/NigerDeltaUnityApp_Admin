@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles, useTheme } from "@mui/styles";
+import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import { Divider, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
@@ -9,11 +9,10 @@ import CategoryForm from "../../../../../forms/category/new_category_form";
 import EditCategoryForm from "../../../../../forms/category/update_category";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
+
 import IconButton from "@mui/material/IconButton";
 import { Edit } from "@mui/icons-material";
 import { Delete } from "@mui/icons-material";
-import { display } from "@mui/system";
 import { Grid } from "@mui/material";
 import {
   onSnapshot,
@@ -171,7 +170,7 @@ const Categories = () => {
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());

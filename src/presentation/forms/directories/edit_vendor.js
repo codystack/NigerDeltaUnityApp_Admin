@@ -22,19 +22,21 @@ import {
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
-import { Box } from "@mui/system";
-import { Checkbox, CircularProgress } from "@mui/material";
-import { Typography } from "@mui/material";
-import { Grid } from "@mui/material";
-import { MenuItem } from "@mui/material";
-import { CameraAlt } from "@mui/icons-material";
-import Edit from "@mui/icons-material/Edit";
+import Box from "@mui/system/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Checkbox from "@mui/material/Checkbox";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
+import { useHistory, useLocation } from "react-router-dom";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import { Toolbar } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   image: {
     margin: "0px auto 15px auto",
-    width: 128,
-    height: 100,
+    width: 256,
+    height: 125,
   },
   mb: {
     marginBottom: 10,
@@ -96,12 +98,15 @@ const timesClosed = [
   "12:00 AM",
 ];
 
-const EditVendorForm = (props) => {
+const EditVendorForm = () => {
+  const location = useLocation();
+  const history = useHistory();
   const classes = useStyles();
   let {
-    setOpen,
     id,
     name,
+    logo,
+    image,
     category,
     address,
     description,
@@ -109,8 +114,8 @@ const EditVendorForm = (props) => {
     website,
     opensAt,
     closesAt,
-    is24Hours,
-  } = props;
+    is24hrs,
+  } = location?.state;
 
   const [formValues, setFormValues] = React.useState({
     name: name,
@@ -132,7 +137,7 @@ const EditVendorForm = (props) => {
   const [progress, setProgress] = React.useState(0);
   const [previewImage, setPreviewImage] = React.useState("");
   const [previewLogo, setPreviewLogo] = React.useState("");
-  const [is24Hrs, setIs24Hrs] = React.useState(is24Hours);
+  const [is24Hrs, setIs24Hrs] = React.useState(is24hrs);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -140,7 +145,7 @@ const EditVendorForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -193,7 +198,7 @@ const EditVendorForm = (props) => {
         setIsUploading(false);
         setIsLoading(true);
         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          const mRef = doc(db, "vendors", "" + id);
+          const mRef = doc(db, "directories-vendors", "" + id);
           try {
             await updateDoc(mRef, {
               name: formValues.name,
@@ -208,16 +213,19 @@ const EditVendorForm = (props) => {
               updatedAt: timeNow,
               image: downloadURL,
             });
-            setOpen(false);
             setIsLoading(false);
             enqueueSnackbar(`Vendor updated successfully`, {
               variant: "success",
             });
+            history.goBack();
           } catch (error) {
             setIsLoading(false);
-            enqueueSnackbar(`${error?.message || ""}`, {
-              variant: "error",
-            });
+            enqueueSnackbar(
+              `${error?.message || "Check your internet connection!"}`,
+              {
+                variant: "error",
+              }
+            );
           }
         });
       }
@@ -240,7 +248,7 @@ const EditVendorForm = (props) => {
       },
       (error) => {
         setIsUploading(false);
-        enqueueSnackbar(`${error.message || "Check internet"}`, {
+        enqueueSnackbar(`${error.message || "Check internet connection"}`, {
           variant: "error",
         });
       },
@@ -248,7 +256,7 @@ const EditVendorForm = (props) => {
         setIsUploading(false);
         setIsLoading(true);
         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          const mRef = doc(db, "vendors", "" + id);
+          const mRef = doc(db, "directories-vendors", "" + id);
           try {
             await updateDoc(mRef, {
               name: formValues.name,
@@ -263,11 +271,11 @@ const EditVendorForm = (props) => {
               updatedAt: timeNow,
               logo: downloadURL,
             });
-            setOpen(false);
             setIsLoading(false);
             enqueueSnackbar(`Vendor updated successfully`, {
               variant: "success",
             });
+            history.goBack();
           } catch (error) {
             setIsLoading(false);
             enqueueSnackbar(`${error?.message || "Check your network"}`, {
@@ -281,18 +289,12 @@ const EditVendorForm = (props) => {
 
   const updateVendor = async (e) => {
     setIsLoading(true);
-    // setFormValues({
-    //   title: formValues.title ? formValues.title : title,
-    //   subTitle: formValues.subTitle ? formValues.subTitle : subTitle,
-    //   authorName: formValues.authorName ? formValues.authorName : authorName,
-    //   category: formValues.category ? formValues.category : category,
-    //   body: formValues.body ? formValues.body : body,
-    // });
+
     if (!previewImage && !previewLogo) {
       //No image is changed. So update all text
       const timeNow = new Date();
       try {
-        const mRef = doc(db, "vendors", "" + id);
+        const mRef = doc(db, "directories-vendors", "" + id);
         await updateDoc(mRef, {
           name: formValues.name,
           address: formValues.address,
@@ -305,11 +307,11 @@ const EditVendorForm = (props) => {
           is24Hrs: is24Hrs,
           updatedAt: timeNow,
         });
-        setOpen(false);
         setIsLoading(false);
         enqueueSnackbar(`Vendor updated successfully`, {
           variant: "success",
         });
+        history.goBack();
       } catch (error) {
         setIsLoading(false);
         enqueueSnackbar(`${error?.message || "Check internet connection"}`, {
@@ -381,7 +383,7 @@ const EditVendorForm = (props) => {
                   getDownloadURL(uploadTask?.snapshot?.ref).then(
                     async (downloadURL) => {
                       try {
-                        const mRef = doc(db, "vendors", "" + id);
+                        const mRef = doc(db, "directories-vendors", "" + id);
                         await updateDoc(mRef, {
                           name: formValues.name,
                           address: formValues.address,
@@ -420,11 +422,14 @@ const EditVendorForm = (props) => {
                                 setIsUploading(false);
                                 setIsLoading(true);
                                 try {
-                                  const mRef = doc(db, "vendors", "" + tmn);
+                                  const mRef = doc(
+                                    db,
+                                    "directories-vendors",
+                                    "" + tmn
+                                  );
                                   await updateDoc(mRef, {
                                     logo: download,
                                   });
-                                  setOpen(false);
                                   setIsLoading(false);
                                   enqueueSnackbar(
                                     `Vendor updated successfully`,
@@ -432,6 +437,7 @@ const EditVendorForm = (props) => {
                                       variant: "success",
                                     }
                                   );
+                                  history.goBack();
                                 } catch (error) {
                                   setIsLoading(false);
                                   enqueueSnackbar(
@@ -464,16 +470,22 @@ const EditVendorForm = (props) => {
             })
             .catch((error) => {
               setIsLoading(false);
-              enqueueSnackbar(`${error?.message || ""}`, {
-                variant: "error",
-              });
+              enqueueSnackbar(
+                `${error?.message || "Check your internet connection!"}`,
+                {
+                  variant: "error",
+                }
+              );
             });
         })
         .catch((error) => {
           setIsLoading(false);
-          enqueueSnackbar(`${error?.message || ""}`, {
-            variant: "error",
-          });
+          enqueueSnackbar(
+            `${error?.message || "Check your internet connection!"}`,
+            {
+              variant: "error",
+            }
+          );
         });
     }
   };
@@ -493,97 +505,107 @@ const EditVendorForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updateVendor}>
-        <TextValidator
-          id="image"
-          size="small"
-          style={{ display: "none" }}
-          variant="outlined"
-          value={formValues.image}
-          name="image"
-          type="file"
-          fullWidth
-          disabled={isLoading}
-          accept=".png, .jpg, .jpeg"
-          onChange={handleChange}
-          validators={["required"]}
-          errorMessages={["Featured image is required"]}
-          helperText="Featured image"
-        />
-
-        <TextValidator
-          className={classes.mb}
-          id="logo"
-          size="small"
-          variant="outlined"
-          style={{ display: "none" }}
-          value={formValues.logo}
-          name="logo"
-          type="file"
-          fullWidth
-          disabled={isLoading}
-          accept=".png, .jpg, .jpeg,"
-          onChange={handleChange}
-          validators={["required"]}
-          errorMessages={["Vendor's logo is required"]}
-          helperText="Vendor's logo"
-        />
-
-        <label
-          htmlFor="image"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: 144,
-            width: 420,
-            backgroundImage: "url(" + previewImage + ")",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            marginBottom: 24,
-          }}
-          typeof="file"
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "auto",
-              marginBottom: -32,
-            }}
+          <Button
+            disableElevation
+            variant="text"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
           >
-            <label
-              htmlFor="logo"
-              style={{
-                zIndex: 1000,
-                display: "flex",
-                flexDirection: "row",
-                padding: 5,
-              }}
-            >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Update Vendor
+          </Typography>
+        </Box>
+
+        <Grid
+          container
+          spacing={1}
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item xs={12} sm={6} md={7}>
+            <TextValidator
+              id="image"
+              size="small"
+              variant="outlined"
+              value={formValues.image}
+              name="image"
+              type="file"
+              fullWidth
+              disabled={isLoading}
+              accept=".png, .jpg, .jpeg"
+              onChange={handleChange}
+              helperText="Featured image"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={5}>
+            <div>
               <Avatar
-                variant="circular"
-                alt="Author"
-                src={previewLogo}
-                className={classes.logo}
+                variant="rounded"
+                alt="Passport"
+                src={previewImage ? previewImage : image}
+                className={classes.image}
               />
-              <label htmlFor="logo" style={{ marginTop: 16, marginLeft: -10 }}>
-                <div className={classes.subRow}>
-                  <CameraAlt
-                    style={{ color: "white", zIndex: 10000 }}
-                    fontSize="small"
-                  />
-                </div>
-              </label>
-            </label>
-            <label htmlFor="image" style={{ marginBottom: 24, padding: 8 }}>
-              <div className={classes.subRow}>
-                <Edit color="primary" fontSize="small" />
-                <Typography color="blue">Edit</Typography>
-              </div>
-            </label>
-          </div>
-        </label>
+            </div>
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          spacing={1}
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item xs={12} sm={6} md={7}>
+            <TextValidator
+              id="logo"
+              size="small"
+              variant="outlined"
+              value={formValues.logo}
+              name="logo"
+              type="file"
+              fullWidth
+              disabled={isLoading}
+              accept=".png, .jpg, .jpeg"
+              onChange={handleChange}
+              helperText="Vendor's logo"
+            />
+          </Grid>
+
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={5}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Avatar
+              variant="circular"
+              alt="Passport"
+              sx={{ width: 72, height: 72 }}
+              src={previewLogo ? previewLogo : logo}
+              // className={classes.image}
+            />
+          </Grid>
+        </Grid>
+
+        <Toolbar />
 
         <Grid container spacing={1} padding={0} marginBottom={0}>
           <Grid item xs={12} sm={6} md={6}>
@@ -752,7 +774,7 @@ const EditVendorForm = (props) => {
           )}
           <div className={classes.subRow}>
             <Typography fontSize={14}>Always open</Typography>
-            <Checkbox value={is24Hrs} onChange={() => setIs24Hrs(!is24Hrs)} />
+            <Checkbox checked={is24Hrs} onChange={() => setIs24Hrs(!is24Hrs)} />
           </div>
         </div>
 

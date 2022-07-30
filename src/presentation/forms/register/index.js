@@ -93,47 +93,8 @@ const SignupForm = () => {
             console.log("ERR: ", err?.message);
           });
       })
-      .catch((error) => {
-        // Handle Errors here.
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
-      });
+      .catch((error) => {});
   };
-
-  // const formik = useFormik({
-  //   initialValues: {
-  //     firstName: "",
-  //     lastName: "",
-  //     phone: "",
-  //     email: "",
-  //     password: "",
-  //   },
-  //   validationSchema: validationSchema,
-
-  //   onSubmit: (values) => {
-  //     alert("Heergf");
-  //     // try {
-  //     //   const resp = await createUser(values.email, values.password);
-
-  //     //   if (resp.user) {
-  //     //     // Add a second document with a generated ID.
-  //     //     try {
-  //     //       const docRef = await addDoc(collection(db, "users"), {
-  //     //         id: resp.user.uid,
-  //     //         firstname: values.firstName,
-  //     //         lastname: values.lastName,
-  //     //         phone: values.phone,
-  //     //         email: values.email,
-  //     //         userType: "super",
-  //     //       });
-  //     //       console.log("Document written with ID: ", docRef.id);
-  //     //     } catch (e) {
-  //     //       console.error("Error adding document: ", e);
-  //     //     }
-  //     //   }
-  //     // } catch (error) {}
-  //   },
-  // });
 
   return (
     <div>

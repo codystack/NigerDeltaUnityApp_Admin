@@ -19,7 +19,7 @@ import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
-import placeholder from "../../../assets/images/placeholder.png";
+// import placeholder from "../../../assets/images/placeholder.png";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -86,7 +86,7 @@ const EditStateForm = (props) => {
         if (e.target.files[0]) {
           setPreviewImage(URL.createObjectURL(e.target.files[0]));
         } else {
-          setPreviewImage(placeholder);
+          setPreviewImage(img);
         }
       } catch (e) {}
       setFormValues((prevData) => ({
@@ -152,10 +152,7 @@ const EditStateForm = (props) => {
 
   const updateState = async (e) => {
     setIsLoading(true);
-    // setFormValues({
-    //   name: formValues.name ? formValues.name : name,
-    //   slogan: formValues.slogan ? formValues.slogan : slogan,
-    // });
+
     if (!previewImage) {
       //No image is changed. So update all text
       const timeNow = new Date();

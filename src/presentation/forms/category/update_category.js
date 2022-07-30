@@ -7,7 +7,6 @@ import {
   db,
   ref,
   storage,
-  setDoc,
   doc,
   deleteObject,
   uploadBytesResumable,
@@ -15,7 +14,6 @@ import {
   updateDoc,
 } from "../../../data/firebase/";
 import { useSnackbar } from "notistack";
-import { addCategory } from "../../../domain/service";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";

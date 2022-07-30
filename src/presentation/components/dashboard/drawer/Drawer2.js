@@ -11,8 +11,7 @@ import DashBoardIcon from "@mui/icons-material/DashboardOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import { withRouter } from "react-router-dom";
-import { makeStyles, useTheme } from "@mui/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { makeStyles } from "@mui/styles";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import logo from "../../../../assets/images/logo_white.png";
 
@@ -53,8 +52,8 @@ const Drawer2 = (props) => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const container =
-    props.window !== undefined ? () => window().document.body : undefined;
+  // const container =
+  //   props.window !== undefined ? () => window().document.body : undefined;
 
   const drawerItems = [
     {
@@ -103,24 +102,24 @@ const Drawer2 = (props) => {
     },
   ];
 
-  let picSize, cornerSize;
-  const theme = useTheme();
-  const xs = useMediaQuery(theme.breakpoints.only("xs"));
-  const sm = useMediaQuery(theme.breakpoints.only("sm"));
-  const md = useMediaQuery(theme.breakpoints.only("md"));
-  if (xs) {
-    cornerSize = 76;
-    picSize = 70;
-  } else if (sm) {
-    cornerSize = 96;
-    picSize = 90;
-  } else if (md) {
-    cornerSize = 116;
-    picSize = 110;
-  } else {
-    cornerSize = 136;
-    picSize = 130;
-  }
+  // let picSize, cornerSize;
+  // const theme = useTheme();
+  // const xs = useMediaQuery(theme.breakpoints.only("xs"));
+  // const sm = useMediaQuery(theme.breakpoints.only("sm"));
+  // const md = useMediaQuery(theme.breakpoints.only("md"));
+  // if (xs) {
+  //   cornerSize = 76;
+  //   picSize = 70;
+  // } else if (sm) {
+  //   cornerSize = 96;
+  //   picSize = 90;
+  // } else if (md) {
+  //   cornerSize = 116;
+  //   picSize = 110;
+  // } else {
+  //   cornerSize = 136;
+  //   picSize = 130;
+  // }
 
   const handleListItemClick = (to, index) => {
     history.push(to);

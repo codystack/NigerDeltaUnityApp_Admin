@@ -11,8 +11,7 @@ import DashBoardIcon from "@mui/icons-material/DashboardOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import { withRouter } from "react-router-dom";
-import { makeStyles, useTheme } from "@mui/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { makeStyles } from "@mui/styles";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import logo from "../../../../assets/images/icon_blue.png";
 
@@ -99,24 +98,24 @@ const Drawer1 = (props) => {
     },
   ];
 
-  let picSize, cornerSize;
-  const theme = useTheme();
-  const xs = useMediaQuery(theme.breakpoints.only("xs"));
-  const sm = useMediaQuery(theme.breakpoints.only("sm"));
-  const md = useMediaQuery(theme.breakpoints.only("md"));
-  if (xs) {
-    cornerSize = 76;
-    picSize = 70;
-  } else if (sm) {
-    cornerSize = 96;
-    picSize = 90;
-  } else if (md) {
-    cornerSize = 116;
-    picSize = 110;
-  } else {
-    cornerSize = 136;
-    picSize = 130;
-  }
+  // let picSize, cornerSize;
+  // const theme = useTheme();
+  // const xs = useMediaQuery(theme.breakpoints.only("xs"));
+  // const sm = useMediaQuery(theme.breakpoints.only("sm"));
+  // const md = useMediaQuery(theme.breakpoints.only("md"));
+  // if (xs) {
+  //   cornerSize = 76;
+  //   picSize = 70;
+  // } else if (sm) {
+  //   cornerSize = 96;
+  //   picSize = 90;
+  // } else if (md) {
+  //   cornerSize = 116;
+  //   picSize = 110;
+  // } else {
+  //   cornerSize = 136;
+  //   picSize = 130;
+  // }
 
   const handleListItemClick = (to, index) => {
     history.push(to);
@@ -178,7 +177,7 @@ const Drawer1 = (props) => {
         <List className={classes.listRoot}>
           {drawerItems.map((item, index) => {
             const { text, icon, to } = item;
-            if (1 === 1) {
+            if (2 !== 1) {
               return (
                 <ListItem
                   button

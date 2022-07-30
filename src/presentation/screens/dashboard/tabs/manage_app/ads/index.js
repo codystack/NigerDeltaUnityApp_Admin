@@ -14,7 +14,7 @@ import {
   ToggleOffOutlined,
   ToggleOnOutlined,
 } from "@mui/icons-material";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
+// import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import StatusDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
 import IconButton from "@mui/material/IconButton";
@@ -28,6 +28,7 @@ import {
   deleteObject,
   storage,
   deleteDoc,
+  updateDoc,
 } from "../../../../../../data/firebase";
 import { useSnackbar } from "notistack";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
@@ -95,12 +96,13 @@ const useStyles = makeStyles((theme) => ({
 const AdsItem = (props) => {
   const { item } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
   const [openStatus, setOpenStatus] = React.useState(false);
-  const [isActive, setIsActive] = React.useState(false);
+  const [isActive, setIsActive] = React.useState(
+    item?.status === "Active" ? true : false
+  );
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  //   const history = useHistory();
+  const history = useHistory();
 
   React.useEffect(() => {
     if (item?.status) {
@@ -131,10 +133,28 @@ const AdsItem = (props) => {
       });
   };
 
+  const changeStatus = async () => {
+    try {
+      const mRef = doc(db, "ads", "" + item?.id);
+      await updateDoc(mRef, {
+        status: isActive === true ? "Active" : "Completed",
+      });
+      enqueueSnackbar(`Ads status updated successfully`, {
+        variant: "success",
+      });
+      setOpenStatus(false);
+      // history.goBack();
+    } catch (error) {
+      enqueueSnackbar(`${error?.message || "Check internet connection"}`, {
+        variant: "error",
+      });
+    }
+  };
+
   const deleteBody = (
     <div>
       <Typography variant="body2" gutterBottom>
-        {`Are you sure you want to delete ${item?.title} ?`}
+        {`Are you sure you want to delete ${item?.name} ad?`}
       </Typography>
       <br />
       <div className={classes.subRow}>
@@ -170,20 +190,19 @@ const AdsItem = (props) => {
         {`Change Status`}
       </Typography>
       <br />
-      <Typography>{item?.status}</Typography>
+      <Typography gutterBottom>{item?.status}</Typography>
       <div className={classes.subRow}>
         {<CustomizedSwitch value={isActive} setValue={setIsActive} />}
+
+        <Button variant="contained" onClick={() => changeStatus()}>
+          Save
+        </Button>
       </div>
     </Box>
   );
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update Ad"
-        handleClose={() => setOpen(false)}
-      />
       <DeleteDialog
         open={openDelete}
         title="Delete Ad"
@@ -282,9 +301,9 @@ const AdsItem = (props) => {
               gutterBottom
               paddingX={2}
               color={
-                item?.status === "active"
+                item?.status === "Active"
                   ? "orangered"
-                  : item?.status === "completed"
+                  : item?.status === "Completed"
                   ? "green"
                   : "black"
               }
@@ -309,17 +328,33 @@ const AdsItem = (props) => {
           justifyContent={"end"}
           alignItems="end"
         >
-          <IconButton color="error">
+          <IconButton color="error" onClick={() => setOpenDelete(true)}>
             <Typography>Delete</Typography>
             <DeleteOutlined />
           </IconButton>
 
-          <IconButton color="primary">
+          <IconButton
+            color="primary"
+            onClick={() =>
+              history.push({
+                pathname:
+                  "/admin/dashboard/manage-app/ads:" + item?.id + "/edit",
+                state: {
+                  id: item?.id,
+                  banner: item?.banner,
+                  url: item?.url,
+                  startDate: item?.starts,
+                  endDate: item?.ends,
+                  placement: item?.placement,
+                },
+              })
+            }
+          >
             <Typography>Update</Typography>
             <EditOutlined />
           </IconButton>
 
-          <IconButton color="primary">
+          <IconButton color="primary" onClick={() => setOpenStatus(true)}>
             {item?.status === "Active" ? (
               <>
                 <Typography>Stop</Typography>
@@ -328,7 +363,7 @@ const AdsItem = (props) => {
             ) : item?.status === "Completed" ? (
               <>
                 <Typography>Run again</Typography>
-                <ToggleOnOutlined />
+                {/* <ToggleOnOutlined /> */}
               </>
             ) : (
               <>

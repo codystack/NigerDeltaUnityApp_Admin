@@ -6,7 +6,8 @@ import Hidden from "@mui/material/Hidden";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import { makeStyles, useTheme } from "@mui/styles";
+import { makeStyles } from "@mui/styles";
+import Box from "@mui/system/Box";
 import { Switch, Route, withRouter, Redirect } from "react-router-dom";
 
 import Drawer1 from "../../components/dashboard/drawer/Drawer1";
@@ -19,7 +20,6 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 
-import SearchIcon from "@mui/icons-material/Search";
 import Typography from "@mui/material/Typography";
 import HomePage from "./tabs/home";
 import ManageApp from "./tabs/manage_app";
@@ -52,6 +52,31 @@ import AddHistoryForm from "../../forms/history/add_history_form";
 import EditHistoryForm from "../../forms/history/update_history_form";
 import EducationDetail from "./tabs/manage_app/education/education_detail";
 import EditEducationForm from "../../forms/education/edit_education";
+import EditVendorForm from "../../forms/directories/edit_vendor";
+import AddProductForm from "../../forms/products/add_product";
+import EditProductForm from "../../forms/products/edit_product";
+import UpdatePolicyForm from "../../forms/privacy-policy/update_policy_form";
+import UpdateTofSForm from "../../forms/terms-of-service";
+import { Avatar } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import UpdateAdsForm from "../../forms/ads/update_advert_form";
+import {
+  query,
+  collection,
+  onSnapshot,
+  db,
+  doc,
+  auth,
+} from "../../../data/firebase/";
+import {
+  setAdsData,
+  setCategoriesData,
+  setNewsData,
+  setProjectsData,
+  setStatesData,
+  setVendorsData,
+} from "../../../data/store/slice/cms";
+import { setUserData } from "../../../data/store/slice/user";
 
 const drawerWidth = 270;
 const useStyles = makeStyles((theme) => ({
@@ -126,23 +151,20 @@ const useStyles = makeStyles((theme) => ({
 function Dashboard(props) {
   const { window } = props;
   const classes = useStyles();
-  const theme = useTheme();
-  // let { path, url } = useRouteMatch();
-  // const { enqueueSnackbar } = useSnackbar();
-  // const { notifications, userData } = useSelector((state) => state.user);
+  // const theme = useTheme();
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [openSignoutBackDrop, setOpenSignoutBackDrop] = React.useState(false);
-  // const [openNotiModal, setOpenNotiModal] = React.useState(false);
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleBackdrop = (value) => {
     setOpenSignoutBackDrop(value);
-    // console.log("b", openNotiModal);
   };
 
   const handleMobileMenuClose = () => {
@@ -158,22 +180,74 @@ function Dashboard(props) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // const openMobileNotificationModal = (event) => {
-  //   handleMenuClose();
-  // setOpenNotiModal(true);
-  // };
+  React.useEffect(() => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        onSnapshot(doc(db, "users", "" + user.uid), (doc) => {
+          dispatch(setUserData(doc.data()));
+        });
+      }
 
-  // const closeMobileNotificationModal = (event) => {
-  //   setOpenNotiModal(false);
-  // };
+      const statesQuery = query(collection(db, "states"));
+      onSnapshot(statesQuery, (querySnapshot) => {
+        const states = [];
+        querySnapshot.forEach((doc) => {
+          states.push(doc.data());
+        });
+        dispatch(setStatesData(states));
+      });
+
+      const newsQuery = query(collection(db, "news"));
+      onSnapshot(newsQuery, (querySnapshot) => {
+        const news = [];
+        querySnapshot.forEach((doc) => {
+          news.push(doc.data());
+        });
+        dispatch(setNewsData(news));
+      });
+
+      const projectsQuery = query(collection(db, "projects"));
+      onSnapshot(projectsQuery, (querySnapshot) => {
+        const projects = [];
+        querySnapshot.forEach((doc) => {
+          projects.push(doc.data());
+        });
+        dispatch(setProjectsData(projects));
+      });
+
+      const vendorsQuery = query(collection(db, "directories-vendors"));
+      onSnapshot(vendorsQuery, (querySnapshot) => {
+        const vendors = [];
+        querySnapshot.forEach((doc) => {
+          vendors.push(doc.data());
+        });
+        dispatch(setVendorsData(vendors));
+      });
+
+      const categoryQuery = query(collection(db, "categories"));
+      onSnapshot(categoryQuery, (querySnapshot) => {
+        const categories = [];
+        querySnapshot.forEach((doc) => {
+          categories.push(doc.data());
+        });
+        dispatch(setCategoriesData(categories));
+      });
+
+      const adsQuery = query(collection(db, "ads"));
+      onSnapshot(adsQuery, (querySnapshot) => {
+        const ads = [];
+        querySnapshot.forEach((doc) => {
+          ads.push(doc.data());
+        });
+        dispatch(setAdsData(ads));
+      });
+    } catch (e) {}
+  }, [dispatch]);
 
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -204,18 +278,11 @@ function Dashboard(props) {
     ></Menu>
   );
 
-  // const container =
-  //   window !== undefined ? () => window().document.body : undefined;
-  // let resultTrail;
-  // const initials = userData?.First_Name?.slice(0, 1).toUpperCase() + userData?.Surname?.slice(0, 1).toUpperCase();
-  // const trailName = userData?.First_Name + " " + userData?.Surname;
+  const initials =
+    userData?.firstname?.slice(0, 1).toUpperCase() +
+    userData?.lastname?.slice(0, 1).toUpperCase();
 
-  // if (trailName?.length > 12) {
-  //     resultTrail = trailName?.slice(0, 12) + "...";
-  // }
-  // else {
-  //     resultTrail = trailName?.slice(0, 12);
-  // }
+  let fullname = userData?.firstname + " " + userData?.lastname;
 
   return (
     <div className={classes.root}>
@@ -263,16 +330,30 @@ function Dashboard(props) {
               aria-haspopup="true"
               //onClick={handleNotificationMenuOpen}
             ></IconButton>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
+
+            <Box
+              display="flex"
+              flexDirection={"row"}
+              justifyContent="end"
+              alignItems="center"
             >
-              <SearchIcon style={{ color: theme.palette.secondary.main }} />
-            </IconButton>
+              <Typography pr={1}>
+                {fullname?.length > 16
+                  ? fullname?.slice(0, 12) + "..."
+                  : fullname}
+              </Typography>
+              <Avatar
+                src={userData?.image !== "" ? userData?.image : ""}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 32 / 2,
+                  fontSize: 36,
+                }}
+              >
+                {userData?.image !== "" ? "" : initials}
+              </Avatar>
+            </Box>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
@@ -370,9 +451,11 @@ function Dashboard(props) {
             <Route path="/admin/dashboard/manage-app/ads" exact={true}>
               <AdsManager />
             </Route>
-
             <Route path="/admin/dashboard/manage-app/ads/create" exact={true}>
               <CreateAdsForm />
+            </Route>
+            <Route path="/admin/dashboard/manage-app/ads:id/edit" exact={true}>
+              <UpdateAdsForm />
             </Route>
 
             <Route
@@ -416,6 +499,12 @@ function Dashboard(props) {
             <Route path="/admin/dashboard/manage-app/vendors:id" exact={true}>
               <VendorItem />
             </Route>
+            <Route
+              path="/admin/dashboard/manage-app/vendors:id/edit"
+              exact={true}
+            >
+              <EditVendorForm />
+            </Route>
 
             <Route path="/admin/dashboard/manage-app/education" exact={true}>
               <Education />
@@ -436,12 +525,31 @@ function Dashboard(props) {
             >
               <ProductDetail />
             </Route>
+            <Route
+              path="/admin/dashboard/manage-app/vendors:id/products/add-new"
+              exact={true}
+            >
+              <AddProductForm />
+            </Route>
+            <Route
+              path="/admin/dashboard/manage-app/vendors:id/products:de/edit"
+              exact={true}
+            >
+              <EditProductForm />
+            </Route>
 
             <Route
               path="/admin/dashboard/manage-app/privacy-policy"
               exact={true}
             >
               <PrivacyPolicy />
+              {/* UpdatePolicyForm */}
+            </Route>
+            <Route
+              path="/admin/dashboard/manage-app/privacy-policy/edit"
+              exact={true}
+            >
+              <UpdatePolicyForm />
             </Route>
 
             <Route path="/admin/dashboard/manage-app/contact-us" exact={true}>
@@ -453,6 +561,12 @@ function Dashboard(props) {
               exact={true}
             >
               <TermsOfService />
+            </Route>
+            <Route
+              path="/admin/dashboard/manage-app/terms-of-service/edit"
+              exact={true}
+            >
+              <UpdateTofSForm />
             </Route>
 
             <Route

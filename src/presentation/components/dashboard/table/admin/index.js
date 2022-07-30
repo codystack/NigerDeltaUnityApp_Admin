@@ -7,17 +7,17 @@ import {
   GridToolbarExport,
   GridToolbarDensitySelector,
 } from "@mui/x-data-grid";
-// import { useDemoData } from "@mui/x-data-grid-generator";
+
 import {
   onSnapshot,
   query,
   where,
   collection,
   db,
-} from "../../../../data/firebase";
-import Avatar from "@mui/material/Avatar";
-import CustomNoRowsOverlay from "../../misc/placeholder/custom_no_data";
+} from "../../../../../data/firebase/";
+import CustomNoRowsOverlay from "../../../misc/placeholder/custom_no_data";
 import ActionButton from "./action_button";
+import avatar from "../../../../../assets/images/user_avtr.svg";
 
 function CustomToolbar() {
   return (
@@ -30,79 +30,65 @@ function CustomToolbar() {
   );
 }
 
-export default function UserTable() {
+export default function AdminsTable() {
   const columns = [
     {
       field: "photo",
       headerName: "Image",
       width: 75,
-      renderCell: (params) => (
-        <Avatar alt="Profile Picture" src={params.value} />
-      ),
+      renderCell: (params) => <img alt="Profile" src={avatar} width="50%" />,
     },
     {
-      field: "fullName",
-      headerName: "Full name",
+      field: "name",
+      headerName: "NAME",
       description: "This column has a value getter and is not sortable.",
       sortable: false,
-      width: 160,
+      width: 180,
       valueGetter: (params) =>
-        `${params.row.firstname || ""} ${params.row.lastname || ""}`,
+        `${params.row?.name || params.row?.firstname} ${
+          params.row?.lastname || ""
+        }`,
     },
     {
       field: "email",
-      headerName: "Email Address",
-      width: 165,
+      headerName: "EMAIL ADDRESS",
+      width: 210,
     },
     {
       field: "phone",
-      headerName: "Phone",
-      width: 128,
+      headerName: "PHONE",
+      width: 135,
     },
     {
-      field: "gender",
-      headerName: "Gender",
-      width: 86,
-    },
-    {
-      field: "state",
-      headerName: "State of Origin",
+      field: "userType",
+      headerName: "ROLE",
       width: 100,
+      valueGetter: (params) => `${params.row?.userType || ""}`,
     },
     {
-      field: "status",
-      headerName: "Status",
-      width: 96,
+      field: "createdAt",
+      headerName: "CREATED ON",
+      width: 136,
+      valueGetter: (params) =>
+        `${new Date(params?.row?.createdAt?.seconds * 1000).toLocaleDateString(
+          "en-US"
+        )}`,
     },
     {
       field: "id",
       headerName: "ACTIONS",
       width: 130,
       renderCell: (params) => {
-        return (
-          <ActionButton
-            selected={params}
-            type="scholars"
-            // setIsPerforming={setIsPerforming}
-            // handleSetSelectedRow={props.handleSetSelectedRow}
-          />
-        );
+        return <ActionButton selected={params} />;
       },
     },
   ];
 
-  // const { data } = useDemoData({
-  //   dataSet: "Commodity",
-  //   rowLength: 10,
-  //   maxColumns: 6,
-  // });
-
   const [usersList, setUsersList] = React.useState(null);
-  // const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, where("userType", "==", "public"));
+    const q = query(usersRef, where("userType", "!=", "public"));
     onSnapshot(q, (querySnapshot) => {
       const usrs = [];
       querySnapshot.forEach((doc) => {
@@ -115,14 +101,9 @@ export default function UserTable() {
     };
   }, []);
 
-  if (usersList) {
-    console.log("Filtered: ", usersList);
-  }
-
   return (
-    <div style={{ height: 400, width: "100%" }}>
+    <div style={{ height: 500, width: "100%" }}>
       <DataGrid
-        // {...data}
         rows={usersList}
         columns={columns}
         components={{

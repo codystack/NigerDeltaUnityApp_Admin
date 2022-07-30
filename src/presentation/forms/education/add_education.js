@@ -105,7 +105,7 @@ const AddEducationForm = (props) => {
 
   React.useEffect(() => {
     const q = query(collection(db, "education-categories"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const categories = [];
       querySnapshot.forEach((doc) => {
         categories.push(doc.data());
@@ -119,7 +119,13 @@ const AddEducationForm = (props) => {
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+      } catch (e) {}
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,

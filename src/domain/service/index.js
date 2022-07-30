@@ -10,22 +10,13 @@ import {
   doc,
   db,
 } from "../../data/firebase/";
-// import { useSnackbar } from "notistack";
-
-// export default function Service() {
-//   const { enqueueSnackbar } = useSnackbar();
-// }
 
 export const createUser = async (email, pass) => {
   return await createUserWithEmailAndPassword(auth, email, pass);
 };
 
 export const signInUser = async (email, pass) => {
-  // try {
   return await signInWithEmailAndPassword(auth, email, pass);
-  // } catch (error) {
-  //   console.log(error);
-  // }
 };
 
 export const addCategory = async (id, name, image) => {
@@ -35,9 +26,4 @@ export const addCategory = async (id, name, image) => {
     name: name,
     url: image,
   });
-  //   db.collection("categories").doc(id).set({
-  //     id: id,
-  //     name: name,
-  //     url: image,
-  //   });
 };

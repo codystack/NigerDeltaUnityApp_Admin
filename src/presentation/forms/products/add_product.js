@@ -14,12 +14,16 @@ import {
 } from "../../../data/firebase";
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
-import { Box } from "@mui/system";
-import { CircularProgress, Grid, TextField } from "@mui/material";
-import { Typography } from "@mui/material";
+import Box from "@mui/system/Box";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
 import placeholder from "../../../assets/images/placeholder.png";
 import NumberFormat from "react-number-format";
 import QuillEditor from "../../components/misc/richtext/quill";
+import { useHistory, useLocation } from "react-router-dom";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -62,15 +66,17 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const AddProductForm = (props) => {
+const AddProductForm = () => {
+  const location = useLocation();
+  const history = useHistory();
   const classes = useStyles();
-  let { setOpen, vendorID, vendorAddress, vendorPhone, vendorName } = props;
-  // let deliveryTypes = ["Free delivery", "Pick up", "Pay on delivery"];
+  let { vendorID, vendorAddress, vendorPhone, vendorName } = location.state;
+
   const [formValues, setFormValues] = React.useState({
     name: "",
     image: "",
-    vendorAddress: "",
-    vendorPhone: "",
+    vendorAddress: vendorAddress,
+    vendorPhone: vendorPhone,
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -139,14 +145,13 @@ const AddProductForm = (props) => {
             updatedAt: timeNow,
           })
             .then((res) => {
-              setOpen(false);
               setIsLoading(false);
               enqueueSnackbar(`New catalog added successfully`, {
                 variant: "success",
               });
+              history.goBack();
             })
             .catch((error) => {
-              setIsLoading(false);
               setIsLoading(false);
               enqueueSnackbar(
                 `${error?.message || "Check your internet connection"}`,
@@ -175,6 +180,26 @@ const AddProductForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={createCatalog}>
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            disableElevation
+            variant="text"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Add New Product/Service
+          </Typography>
+        </Box>
         <Grid container spacing={1} padding={1}>
           <Grid item xs={12} sm={6} md={7}>
             <TextValidator

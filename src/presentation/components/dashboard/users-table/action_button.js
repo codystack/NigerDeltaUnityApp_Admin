@@ -4,14 +4,13 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-// import EmptyModal from "../modal/EmptyModal";
+
 import MoreVertIcon from "@mui/icons-material/MoreVertRounded";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import VisibilityIcon from "@mui/icons-material/VisibilityOutlined";
 import Fade from "@mui/material/Fade";
-// import DataPreview from "../miscellaneous/DataPreview";
-import { useSnackbar } from "notistack";
+
 import { useSelector } from "react-redux";
 import { makeStyles } from "@mui/styles";
 import CustomDialog from "../dialogs/custom-dialog";
@@ -41,7 +40,7 @@ const ActionButton = ({ selected, setIsPerforming, type }) => {
   const [openDelete, setOpenDelete] = React.useState(false);
 
   const openAction = Boolean(anchorEl);
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
   const { userData } = useSelector((state) => state.user);
   const handleMoreAction = (e) => setAnchorEl(e.currentTarget);
   const handleCloseMoreAction = () => setAnchorEl(null);
@@ -49,11 +48,11 @@ const ActionButton = ({ selected, setIsPerforming, type }) => {
   // const { data: scholarData } = useSWR('/applicants/scholars/' + selected.row._id, APIService.authFetcher);
 
   React.useEffect(() => {
-    console.log("DATS: ", userData);
+    console.log("DATS: ", openPreviewModal);
     return () => {
       //   cleanup
     };
-  }, []);
+  }, [openPreviewModal]);
 
   const handlePreview = () => {
     handleCloseMoreAction();

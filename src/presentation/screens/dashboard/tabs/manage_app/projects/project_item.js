@@ -88,14 +88,14 @@ const ProjectItem = (props) => {
             variant: "success",
           });
         } catch (error) {
-          console.log("ERR: Del: ", error);
+          // console.log("ERR: Del: ", error);
           enqueueSnackbar(`Item not deleted. Try again`, {
             variant: "error",
           });
         }
       })
       .catch((error) => {
-        console.log("ErR: ", error);
+        // console.log("ErR: ", error);
       });
   };
 

@@ -7,8 +7,7 @@ import image from "../../../../../../assets/images/privacy.jpeg";
 import Grid from "@mui/material/Grid";
 import { useHistory } from "react-router-dom";
 import { onSnapshot, db, doc } from "../../../../../../data/firebase";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import UpdatePolicyForm from "../../../../../forms/privacy-policy/update_policy_form";
+import ReactQuill from "react-quill";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,26 +33,20 @@ const useStyles = makeStyles((theme) => ({
 const PrivacyPolicy = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [open, setOpen] = React.useState(false);
   const [privacyData, setPrivacyData] = React.useState(null);
 
   React.useEffect(() => {
-    onSnapshot(doc(db, "others", "privacy-policy"), (doc) => {
-      console.log("Current data: ", doc.data());
+    onSnapshot(doc(db, "others", "privacy"), (doc) => {
       setPrivacyData(doc.data());
     });
-  }, []);
+  }, [privacyData]);
+
+  let modules = {
+    toolbar: null,
+  };
 
   return (
     <div>
-      <CustomDialog
-        title="Update Privacy Policy"
-        open={open}
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <UpdatePolicyForm setOpen={setOpen} body={privacyData?.body} />
-        }
-      />
       <div className={classes.row}>
         <Button
           variant="text"
@@ -68,14 +61,26 @@ const PrivacyPolicy = () => {
         <Button
           startIcon={<Edit />}
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={() =>
+            history.push({
+              pathname: "/admin/dashboard/manage-app/privacy-policy/edit",
+              state: {
+                body: privacyData?.body,
+              },
+            })
+          }
         >
           Edit
         </Button>
       </div>
       <br />
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={6} md={7}>
+        <Grid item xs={12} sm={12} md={12}>
+          <div>
+            <img src={image} alt="featured-img" width="45%" />
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
           {privacyData && (
             <>
               <Typography gutterBottom align="left" fontSize={13}>
@@ -84,15 +89,13 @@ const PrivacyPolicy = () => {
                   privacyData?.updatedAt?.seconds * 1000
                 ).toLocaleDateString("en-US")}`}
               </Typography>
-              <Typography align="justify">{privacyData?.body}</Typography>
+              <ReactQuill
+                value={privacyData?.body}
+                readOnly={true}
+                modules={modules}
+              />
             </>
           )}
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={5}>
-          <div>
-            <img src={image} alt="featured-img" width="100%" />
-          </div>
         </Grid>
       </Grid>
     </div>

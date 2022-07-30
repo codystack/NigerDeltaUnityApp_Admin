@@ -18,10 +18,6 @@ import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
 import ReactQuill from "react-quill"; // ES6
 
-// import MUIRichTextEditor from "mui-rte";
-// import parse from "html-react-parser";
-// import QuillEditor from "../../../../../components/misc/richtext/quill";
-
 const useStyles = makeStyles((theme) => ({
   row: {
     display: "flex",
@@ -222,12 +218,6 @@ const NewsItem = (props) => {
           readOnly={true}
           modules={modules}
         />
-        {/* <MUIRichTextEditor
-          readOnly
-          defaultValue={location?.state?.body}
-          inlineToolbar={false}
-          toolbar={false}
-        /> */}
       </div>
       <br />
 

@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import {
   getAuth,
+  updatePassword,
   setPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
@@ -29,16 +30,6 @@ import {
   uploadBytesResumable,
   deleteObject,
 } from "firebase/storage";
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDfJON4SG_vyKRZIMeDdhs6yHywfDev0as",
-//   authDomain: "ndua-b15fc.firebaseapp.com",
-//   projectId: "ndua-b15fc",
-//   storageBucket: "ndua-b15fc.appspot.com",
-//   messagingSenderId: "327501807065",
-//   appId: "1:327501807065:web:9f588cfb326bf323b2adc8",
-//   measurementId: "G-H7JNHH73EG",
-// };
 
 const firebaseConfig = {
   apiKey: "AIzaSyB9GzDQHns2tzC3zzjMdhuVuQzurGd8VpY",
@@ -77,6 +68,7 @@ export {
   uploadBytes,
   deleteObject,
   arrayUnion,
+  updatePassword,
   setPersistence,
   getDownloadURL,
   uploadBytesResumable,

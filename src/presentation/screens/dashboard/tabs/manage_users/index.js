@@ -1,30 +1,31 @@
-import React from "react";
+import * as React from "react";
+import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
+import { useTheme } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
-import Button from "@mui/material/Button";
-import { Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import GeneralUsers from "./general_users";
+import AdminUsers from "./admin_users";
+import { useSelector } from "react-redux";
 import CustomDialog from "../../../../components/dashboard/dialogs/custom-dialog";
-import {
-  onSnapshot,
-  query,
-  collection,
-  db,
-} from "../../../../../data/firebase";
-import { useHistory } from "react-router-dom";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import UsersTable from "../../../../components/dashboard/users-table";
 import CreateAdminForm from "../../../../forms/admin/create_admin_form";
+import Button from "@mui/material/Button";
+import Add from "@mui/icons-material/Add";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: 386,
+    height: 300,
     width: "100%",
   },
   row: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: "end",
+    alignItems: "end",
   },
   rowHeader: {
     display: "flex",
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
     flexDirection: "column",
     margin: "auto",
-    minHeight: 256,
+    minHeight: 275,
     minWidth: 320,
     alignItems: "center",
   },
@@ -71,59 +72,99 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ManageUsers = () => {
-  const classes = useStyles();
-  const history = useHistory();
-  const [open, setOpen] = React.useState(false);
-  const [newsList, setNewsList] = React.useState(null);
-
-  React.useEffect(() => {
-    const q = query(collection(db, "news"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const news = [];
-      querySnapshot.forEach((doc) => {
-        news.push(doc.data());
-      });
-      setNewsList(news);
-    });
-  }, []);
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
   return (
-    <div>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ py: 3, px: 0 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+}
+
+export default function Users() {
+  const theme = useTheme();
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const { userData } = useSelector((state) => state.user);
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const handleChangeIndex = (index) => {
+    setValue(index);
+  };
+
+  return (
+    <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
       <CustomDialog
-        open={open}
-        title="Create New Admin"
-        handleClose={() => setOpen(false)}
+        title="CREATE NEW USER"
         bodyComponent={<CreateAdminForm setOpen={setOpen} />}
+        open={open}
+        handleClose={() => setOpen(false)}
       />
       <div className={classes.row}>
-        <div className={classes.lhsRow}>
-          <Button
-            startIcon={<ArrowBackIosNewIcon />}
-            onClick={() => history.goBack()}
-          >
-            Back
-          </Button>
-          <Typography variant="h6" color="blue" fontSize={18}>
-            All Users
-          </Typography>
-        </div>
         <Button
+          disabled={userData?.userType !== "Admin"}
           startIcon={<Add />}
           color="primary"
           variant="contained"
+          sx={{ marginY: 2 }}
           onClick={() => setOpen(true)}
         >
           Create Admin
         </Button>
       </div>
-      <br />
-      <Typography>Mobile Application Users</Typography>
-      <div>
-        <UsersTable />
-      </div>
-    </div>
+      <AppBar position="static">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          indicatorColor="secondary"
+          textColor="inherit"
+          variant="fullWidth"
+          aria-label="full width tabs example"
+        >
+          <Tab label="General Users" {...a11yProps(0)} />
+          <Tab label="Administrative Users" {...a11yProps(1)} />
+        </Tabs>
+      </AppBar>
+      <SwipeableViews
+        axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+        index={value}
+        onChangeIndex={handleChangeIndex}
+      >
+        <TabPanel value={value} index={0} dir={theme.direction}>
+          <GeneralUsers />
+        </TabPanel>
+        <TabPanel value={value} index={1} dir={theme.direction}>
+          <AdminUsers />
+        </TabPanel>
+      </SwipeableViews>
+    </Box>
   );
-};
-
-export default ManageUsers;
+}

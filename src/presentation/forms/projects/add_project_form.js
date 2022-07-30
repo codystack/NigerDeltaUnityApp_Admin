@@ -29,8 +29,7 @@ import { Typography } from "@mui/material";
 import Dropzone from "react-dropzone";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-// import RichText from "../../components/misc/richtext";
-// import { FormatColorResetRounded } from "@mui/icons-material";
+import placeholder from "../../../assets/images/placeholder.png";
 import QuillEditor from "../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
@@ -135,7 +134,13 @@ const AddProjectForm = (props) => {
 
     if (id === "image") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(placeholder);
+        }
+      } catch (e) {}
       setFormValues((prevData) => ({
         ...prevData,
         image: e.target.value,
@@ -151,7 +156,7 @@ const AddProjectForm = (props) => {
 
   const handleUpload = (tnw) => {
     const promises = [];
-    files?.map((image) => {
+    files?.forEach((image) => {
       let storageRef = ref(storage, `projects/${image?.name}`);
       let uploadTask = uploadBytesResumable(storageRef, files);
       promises.push(uploadTask);

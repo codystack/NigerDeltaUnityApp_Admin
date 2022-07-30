@@ -19,12 +19,13 @@ import {
 import { useSnackbar } from "notistack";
 import Backdrop from "@mui/material/Backdrop";
 import { Box } from "@mui/system";
-import { CircularProgress } from "@mui/material";
+import { Avatar, CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
-import Edit from "@mui/icons-material/Edit";
 import DatePicker from "../../components/misc/datepicker";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
+import { useHistory, useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -67,32 +68,40 @@ const CircularProgressWithLabel = (props) => {
   );
 };
 
-const places = ["Home page", "Directories", "News"];
+const places = ["Home page", "Directories"];
 
-const UpdateAdsForm = (props) => {
+const UpdateAdsForm = () => {
+  const location = useLocation();
   const classes = useStyles();
-  let { setOpen, id, banner, url, startDate, endDate, location } = props;
+  const history = useHistory();
+  let { id, banner, url, startDate, endDate, placement } = location?.state;
   const [formValues, setFormValues] = React.useState({
     banner: "",
     url: url,
     starts: startDate,
     ends: endDate,
-    placement: location,
+    placement: placement,
   });
   const [file, setFile] = React.useState(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const [previewImage, setPreviewImage] = React.useState(banner);
+  const [previewImage, setPreviewImage] = React.useState("");
   const { enqueueSnackbar } = useSnackbar();
-  const coverRef = React.useRef();
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
 
     if (id === "banner") {
       setFile(e.target.files[0]);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      try {
+        if (e.target.files[0]) {
+          setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        } else {
+          setPreviewImage(banner);
+        }
+      } catch (e) {}
+
       setFormValues((prevData) => ({
         ...prevData,
         banner: e.target.value,
@@ -136,11 +145,11 @@ const UpdateAdsForm = (props) => {
               updatedAt: timeNow,
               banner: downloadURL,
             });
-            setOpen(false);
             setIsLoading(false);
             enqueueSnackbar(`Ad updated successfully`, {
               variant: "success",
             });
+            history.goBack();
           } catch (error) {
             setIsLoading(false);
             enqueueSnackbar(
@@ -157,13 +166,7 @@ const UpdateAdsForm = (props) => {
 
   const updateAd = async (e) => {
     setIsLoading(true);
-    // setFormValues({
-    //   title: formValues.title ? formValues.title : title,
-    //   subTitle: formValues.subTitle ? formValues.subTitle : subTitle,
-    //   authorName: formValues.authorName ? formValues.authorName : authorName,
-    //   category: formValues.category ? formValues.category : category,
-    //   body: formValues.body ? formValues.body : body,
-    // });
+
     if (!previewImage) {
       //No image is changed. So update all text
       const timeNow = new Date();
@@ -176,11 +179,11 @@ const UpdateAdsForm = (props) => {
           ends: formValues.ends,
           updatedAt: timeNow,
         });
-        setOpen(false);
         setIsLoading(false);
         enqueueSnackbar(`Ads updated successfully`, {
           variant: "success",
         });
+        history.goBack();
       } catch (error) {
         setIsLoading(false);
         enqueueSnackbar(`${error?.message || "Check internet connection"}`, {
@@ -220,56 +223,54 @@ const UpdateAdsForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updateAd}>
-        <TextValidator
-          ref={coverRef}
-          id="banner"
-          size="small"
-          style={{ display: "none" }}
-          variant="outlined"
-          value={formValues.banner}
-          name="banner"
-          type="file"
-          fullWidth
-          disabled={isLoading}
-          accept=".png, .jpg, .jpeg"
-          onChange={handleChange}
-          validators={["required"]}
-          errorMessages={["Featured image is required"]}
-          helperText="Featured image"
-        />
-
-        <label
-          htmlFor="banner"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: 144,
-            width: 420,
-            backgroundImage: "url(" + previewImage + ")",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            marginBottom: 24,
-          }}
-          typeof="file"
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "end",
-              alignItems: "center",
-              marginTop: "auto",
-              marginBottom: -32,
-            }}
+          <Button
+            variant="text"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
           >
-            <label htmlFor="banner" style={{ marginBottom: 24, padding: 8 }}>
-              <div className={classes.subRow}>
-                <Edit color="primary" fontSize="small" />
-                <Typography color="blue">Edit</Typography>
-              </div>
-            </label>
-          </div>
-        </label>
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Update Advert
+          </Typography>
+        </Box>
+
+        <Grid container spacing={1} padding={1}>
+          <Grid item xs={12} sm={6} md={7}>
+            <TextValidator
+              id="banner"
+              size="small"
+              variant="outlined"
+              value={formValues.banner}
+              name="banner"
+              type="file"
+              fullWidth
+              disabled={isLoading}
+              accept=".png, .jpg, .jpeg"
+              onChange={handleChange}
+              helperText="Featured image"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={5}>
+            <div>
+              <Avatar
+                variant="rounded"
+                alt="Passport"
+                src={previewImage ? previewImage : banner}
+                className={classes.image}
+              />
+            </div>
+          </Grid>
+        </Grid>
 
         <TextValidator
           className={classes.mb}
@@ -334,7 +335,7 @@ const UpdateAdsForm = (props) => {
           disabled={isLoading || isUploading}
           fullWidth
         >
-          Create Ad
+          Update Now
         </Button>
       </ValidatorForm>
     </div>

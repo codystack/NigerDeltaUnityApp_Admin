@@ -24,7 +24,6 @@ import {
   deleteDoc,
 } from "../../../../../../data/firebase";
 import { useSnackbar } from "notistack";
-import AddNewsForm from "../../../../../forms/news/add_news_form";
 import Avatar from "@mui/material/Avatar";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import { useHistory } from "react-router-dom";
@@ -33,7 +32,6 @@ import Paper from "@mui/material/Paper";
 import DirEditCategoryForm from "../../../../../forms/directories/edit_category";
 import DirAddCategoryForm from "../../../../../forms/directories/add_category";
 import AddVendorForm from "../../../../../forms/directories/add_vendor";
-import EditVendorForm from "../../../../../forms/directories/edit_vendor";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,24 +90,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const VendorItemCard = (props) => {
-  const {
-    id,
-    image,
-    logo,
-    name,
-    address,
-    category,
-    phone,
-    website,
-    description,
-    opensAt,
-    closesAt,
-    is24hrs,
-    blocked,
-    item,
-  } = props;
+  const { id, image, logo, name, category, description, item } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
@@ -125,7 +107,7 @@ const VendorItemCard = (props) => {
           .then(async () => {
             // Images deleted now delete from firestore,
             try {
-              await deleteDoc(doc(db, "news", "" + id));
+              await deleteDoc(doc(db, "directories-vendors", "" + id));
               enqueueSnackbar(`Item deleted successfully`, {
                 variant: "success",
               });
@@ -173,31 +155,9 @@ const VendorItemCard = (props) => {
 
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Update Vendor"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <EditVendorForm
-            setOpen={setOpen}
-            img={image}
-            id={id}
-            logo={logo}
-            name={name}
-            address={address}
-            phone={phone}
-            website={website}
-            category={category}
-            opensAt={opensAt}
-            closesAt={closesAt}
-            description={description}
-            is24hrs={is24hrs}
-          />
-        }
-      />
       <DeleteDialog
         open={openDelete}
-        title="Delete News"
+        title="Delete Vendor"
         handleClose={() => setOpenDelete(false)}
         bodyComponent={deleteBody}
       />
@@ -205,20 +165,34 @@ const VendorItemCard = (props) => {
         <div className={classes.rowHeader}>
           <div className={classes.lhsRow}>
             <Avatar alt="Passport" src={logo} className={classes.avatar} />
-            {/* <div className={classes.column}>
-              <Typography variant="body2" fontSize={14}>
-                {authorName}
-              </Typography>
-              <Typography variant="body2" fontSize={13}>
-                {date}
-              </Typography>
-            </div> */}
           </div>
           <div className={classes.subRow}>
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               color="primary"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                history.push({
+                  pathname:
+                    "/admin/dashboard/manage-app/vendors:" + item?.id + "/edit",
+                  state: {
+                    id: item?.id,
+                    name: item?.name,
+                    phone: item?.phone,
+                    category: item?.category,
+                    image: item?.image,
+                    description: item?.description,
+                    logo: item?.logo,
+                    address: item?.address,
+                    website: item?.website,
+                    blocked: item?.blocked,
+                    opensAt: item?.opensAt,
+                    closesAt: item?.closesAt,
+                    is24hrs: item?.is24Hours,
+                    createdAt: item?.createdAt,
+                    updatedAt: item?.updatedAt,
+                  },
+                })
+              }
             >
               <Edit />
             </IconButton>
@@ -248,7 +222,7 @@ const VendorItemCard = (props) => {
                 blocked: item?.blocked,
                 opensAt: item?.opensAt,
                 closesAt: item?.closesAt,
-                is24hrs: item?.is24hrs,
+                is24hrs: item?.is24hours,
                 createdAt: item?.createdAt,
                 updatedAt: item?.updatedAt,
               },
@@ -297,12 +271,11 @@ const VendorItemCard = (props) => {
 };
 
 const VendorCategoryCard = (props) => {
-  const { id, name, updatedAt } = props;
+  const { id, name } = props;
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
 
   const deleteItem = async () => {
     setOpenDelete(false);
@@ -511,34 +484,7 @@ const Directories = () => {
             columns={{ xs: 4, sm: 8, md: 12 }}
           >
             {vendorsList?.map((item, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={6}
-                key={index}
-                onClick={() =>
-                  history.push({
-                    pathname: "/admin/dashboard/manage-app/vendors:" + item?.id,
-                    state: {
-                      name: vendorsList[index]?.name,
-                      address: vendorsList[index]?.address,
-                      phone: vendorsList[index]?.phone,
-                      image: vendorsList[index]?.image,
-                      website: vendorsList[index]?.website,
-                      opensAt: vendorsList[index]?.opensAt,
-                      closesAt: vendorsList[index]?.closesAt,
-                      description: vendorsList[index]?.description,
-                      createdAt: vendorsList[index]?.createdAt,
-                      updatedAt: vendorsList[index]?.updatedAt,
-                      category: vendorsList[index]?.category,
-                      logo: vendorsList[index]?.logo,
-                      id: vendorsList[index]?.id,
-                      is24hrs: vendorsList[index]?.is24Hours,
-                    },
-                  })
-                }
-              >
+              <Grid item xs={12} sm={6} md={6} key={index}>
                 <VendorItemCard
                   item={item}
                   id={vendorsList[index]?.id}

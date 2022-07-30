@@ -251,7 +251,7 @@ const CategoryCard = (props) => {
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
+  // const history = useHistory();
 
   const deleteItem = async () => {
     setOpenDelete(false);

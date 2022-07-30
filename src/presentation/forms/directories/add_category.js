@@ -18,8 +18,6 @@ import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
 import { Avatar } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import QuillEd from "../../components/misc/richtext/quill";
-import Editor from "../../components/misc/richtext/quill";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -72,8 +70,6 @@ const DirAddCategoryForm = (props) => {
   const [previewImage, setPreviewImage] = React.useState(placeholder);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [v, setV] = React.useState(null);
-
   const { enqueueSnackbar } = useSnackbar();
 
   const handleChange = (e) => {
@@ -92,10 +88,6 @@ const DirAddCategoryForm = (props) => {
   React.useEffect(() => {
     setIsLoading(false);
   }, []);
-
-  React.useEffect(() => {
-    console.log("de-value:: ", v);
-  }, [v]);
 
   const createCategory = (e) => {
     const timeNow = new Date();

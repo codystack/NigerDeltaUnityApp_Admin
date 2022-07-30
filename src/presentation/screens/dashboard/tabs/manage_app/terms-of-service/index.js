@@ -7,8 +7,7 @@ import image from "../../../../../../assets/images/terms_of_service.jpeg";
 import Grid from "@mui/material/Grid";
 import { useHistory } from "react-router-dom";
 import { onSnapshot, db, doc } from "../../../../../../data/firebase";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-import UpdateTermsOfServiceForm from "../../../../../forms/terms-of-service";
+import ReactQuill from "react-quill";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,26 +33,20 @@ const useStyles = makeStyles((theme) => ({
 const TermsOfService = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [open, setOpen] = React.useState(false);
   const [termsData, setTermsData] = React.useState(null);
 
   React.useEffect(() => {
-    onSnapshot(doc(db, "others", "terms-of-service"), (doc) => {
-      //   console.log("Current data: ", doc.data());
+    onSnapshot(doc(db, "others", "terms"), (doc) => {
       setTermsData(doc.data());
     });
-  }, []);
+  }, [termsData]);
+
+  let modules = {
+    toolbar: null,
+  };
 
   return (
     <div>
-      <CustomDialog
-        title="Update Terms Of Service"
-        open={open}
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <UpdateTermsOfServiceForm setOpen={setOpen} body={termsData?.body} />
-        }
-      />
       <div className={classes.row}>
         <Button
           variant="text"
@@ -68,14 +61,26 @@ const TermsOfService = () => {
         <Button
           startIcon={<Edit />}
           variant="contained"
-          onClick={() => setOpen(true)}
+          onClick={() =>
+            history.push({
+              pathname: "/admin/dashboard/manage-app/terms-of-service/edit",
+              state: {
+                body: termsData?.body,
+              },
+            })
+          }
         >
           Edit
         </Button>
       </div>
       <br />
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={6} md={7}>
+        <Grid item xs={12} sm={12} md={12}>
+          <div>
+            <img src={image} alt="featured-img" width="45%" />
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
           {termsData && (
             <>
               <Typography gutterBottom align="left" fontSize={13}>
@@ -84,15 +89,13 @@ const TermsOfService = () => {
                   termsData?.updatedAt?.seconds * 1000
                 ).toLocaleDateString("en-US")}`}
               </Typography>
-              <Typography align="justify">{termsData?.body}</Typography>
+              <ReactQuill
+                value={termsData?.body}
+                readOnly={true}
+                modules={modules}
+              />
             </>
           )}
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={5}>
-          <div>
-            <img src={image} alt="featured-img" width="100%" />
-          </div>
         </Grid>
       </Grid>
     </div>

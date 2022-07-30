@@ -7,17 +7,16 @@ import {
   GridToolbarExport,
   GridToolbarDensitySelector,
 } from "@mui/x-data-grid";
-// import { useDemoData } from "@mui/x-data-grid-generator";
 import {
   onSnapshot,
   query,
   where,
   collection,
   db,
-} from "../../../../data/firebase";
-import Avatar from "@mui/material/Avatar";
-import CustomNoRowsOverlay from "../../misc/placeholder/custom_no_data";
+} from "../../../../../data/firebase";
+import CustomNoRowsOverlay from "../../../misc/placeholder/custom_no_data";
 import ActionButton from "./action_button";
+import avatar from "../../../../../assets/images/user_avtr.svg";
 
 function CustomToolbar() {
   return (
@@ -30,75 +29,65 @@ function CustomToolbar() {
   );
 }
 
-export default function UserTable() {
+export default function UsersTable() {
   const columns = [
     {
       field: "photo",
       headerName: "Image",
       width: 75,
       renderCell: (params) => (
-        <Avatar alt="Profile Picture" src={params.value} />
+        <img alt="Profile" color="blue" src={avatar} width="50%" />
       ),
     },
     {
-      field: "fullName",
-      headerName: "Full name",
+      field: "name",
+      headerName: "NAME",
       description: "This column has a value getter and is not sortable.",
       sortable: false,
       width: 160,
       valueGetter: (params) =>
-        `${params.row.firstname || ""} ${params.row.lastname || ""}`,
+        `${params.row?.name || params.row?.firstname} ${
+          params.row?.lastname || ""
+        }`,
     },
     {
       field: "email",
-      headerName: "Email Address",
-      width: 165,
+      headerName: "EMAIL ADDRESS",
+      width: 160,
     },
     {
       field: "phone",
-      headerName: "Phone",
-      width: 128,
+      headerName: "PHONE",
+      width: 135,
     },
     {
       field: "gender",
-      headerName: "Gender",
-      width: 86,
+      headerName: "GENDER",
+      width: 110,
+      valueGetter: (params) => `${params.row?.gender || ""}`,
     },
     {
-      field: "state",
-      headerName: "State of Origin",
+      field: "osPlatform",
+      headerName: "PLATFORM",
+      width: 120,
+      valueGetter: (params) => `${params.row?.osPlatform || ""}`.toUpperCase(),
+    },
+    {
+      field: "isBlocked",
+      headerName: "BLOCKED",
       width: 100,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 96,
     },
     {
       field: "id",
       headerName: "ACTIONS",
       width: 130,
       renderCell: (params) => {
-        return (
-          <ActionButton
-            selected={params}
-            type="scholars"
-            // setIsPerforming={setIsPerforming}
-            // handleSetSelectedRow={props.handleSetSelectedRow}
-          />
-        );
+        return <ActionButton selected={params} />;
       },
     },
   ];
 
-  // const { data } = useDemoData({
-  //   dataSet: "Commodity",
-  //   rowLength: 10,
-  //   maxColumns: 6,
-  // });
-
   const [usersList, setUsersList] = React.useState(null);
-  // const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     const usersRef = collection(db, "users");
@@ -120,9 +109,8 @@ export default function UserTable() {
   }
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
+    <div style={{ height: 512, width: "100%" }}>
       <DataGrid
-        // {...data}
         rows={usersList}
         columns={columns}
         components={{

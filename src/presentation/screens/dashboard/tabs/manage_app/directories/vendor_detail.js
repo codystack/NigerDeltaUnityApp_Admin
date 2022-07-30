@@ -3,24 +3,8 @@ import { Avatar, Button, Divider, Typography } from "@mui/material";
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import CustomDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-// import DeleteDialog from "../../../../../components/dashboard/dialogs/custom-dialog";
-// import { useSnackbar } from "notistack";
-// import {
-//   deleteDoc,
-//   deleteObject,
-//   ref,
-//   db,
-//   doc,
-//   storage,
-//   query,
-//   collection,
-//   onSnapshot,
-// } from "../../../../../../data/firebase";
-// import Delete from "@mui/icons-material/Delete";
-// import Edit from "@mui/icons-material/Edit";
+
 import { Add } from "@mui/icons-material";
-import AddProductForm from "../../../../../forms/products/add_product";
 import Products from "./products";
 import { Box } from "@mui/system";
 
@@ -76,36 +60,8 @@ const VendorItem = (props) => {
   const { history, location } = props;
   const classes = useStyles();
 
-  const [open, setOpen] = React.useState(false);
-  // const [openEdit, setOpenEdit] = React.useState(false);
-  // const [openDelete, setOpenDelete] = React.useState(false);
-  // const [productList, setProductList] = React.useState(null);
-  // const { enqueueSnackbar } = useSnackbar();
-
   return (
     <>
-      <CustomDialog
-        open={open}
-        title="Add Catalog"
-        handleClose={() => setOpen(false)}
-        bodyComponent={
-          <AddProductForm
-            setOpen={setOpen}
-            vendorID={location?.state?.id}
-            vendorName={location?.state?.name}
-            vendorPhone={location?.state?.phone}
-            vendorAddress={location?.state?.address}
-            vendorWebsite={location?.state?.website}
-          />
-        }
-      />
-
-      {/* <DeleteDialog
-        open={openDelete}
-        title="Delete Product"
-        handleClose={() => setOpenDelete(false)}
-        bodyComponent={deleteBody}
-      /> */}
       <div className={classes.row}>
         <Button
           startIcon={<ArrowBackIosNewIcon />}
@@ -226,7 +182,21 @@ const VendorItem = (props) => {
           <Button
             startIcon={<Add />}
             variant="contained"
-            onClick={() => setOpen(true)}
+            onClick={() =>
+              history.push({
+                pathname:
+                  "/admin/dashboard/manage-app/vendors:" +
+                  location?.state?.id +
+                  "/products/add-new",
+                state: {
+                  vendorID: location?.state?.id,
+                  vendorName: location?.state?.name,
+                  vendorPhone: location?.state?.phone,
+                  vendorAddress: location?.state?.address,
+                  vendorWebsite: location?.state?.website,
+                },
+              })
+            }
           >
             Add Catalog
           </Button>

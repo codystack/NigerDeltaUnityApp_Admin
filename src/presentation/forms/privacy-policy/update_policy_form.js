@@ -1,191 +1,60 @@
 import React from "react";
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
-import Avatar from "@mui/material/Avatar";
-import { makeStyles } from "@mui/styles";
+import { ValidatorForm } from "react-material-ui-form-validator";
 import Button from "@mui/material/Button";
-import {
-  db,
-  ref,
-  storage,
-  setDoc,
-  doc,
-  deleteObject,
-  uploadBytesResumable,
-  getDownloadURL,
-  updateDoc,
-} from "../../../data/firebase/";
+import { db, doc, updateDoc } from "../../../data/firebase/";
 import { useSnackbar } from "notistack";
-import { addCategory } from "../../../domain/service";
 import Backdrop from "@mui/material/Backdrop";
-import { Box } from "@mui/system";
-import { CircularProgress } from "@mui/material";
-import { Typography } from "@mui/material";
+import Box from "@mui/system/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import { useHistory, useLocation } from "react-router-dom";
+import QuillEditable from "../../components/misc/richtext/edit_quill";
+import ArrowBackIosNew from "@mui/icons-material/ArrowBackIosNew";
 
-const useStyles = makeStyles((theme) => ({
-  image: {
-    margin: "0px auto 15px auto",
-    width: 128,
-    height: 128,
-  },
-}));
+const UpdatePolicyForm = () => {
+  const location = useLocation();
+  const history = useHistory();
+  let { body } = location?.state;
 
-// const CircularProgressWithLabel = (props) => {
-//   return (
-//     <Box position="relative" display="inline-flex">
-//       <CircularProgress
-//         variant="determinate"
-//         {...props}
-//         size={90}
-//         thickness={3.0}
-//         style={{ color: "green" }}
-//       />
-//       <Box
-//         top={0}
-//         left={0}
-//         bottom={0}
-//         right={0}
-//         position="absolute"
-//         display="flex"
-//         alignItems="center"
-//         justifyContent="center"
-//       >
-//         <Typography
-//           variant="body1"
-//           component="div"
-//           style={{ color: "white", fontFamily: "roboto" }}
-//         >{`${Math.round(props.value)}%`}</Typography>
-//       </Box>
-//     </Box>
-//   );
-// };
-
-const UpdatePolicyForm = (props) => {
-  const classes = useStyles();
-  let { setOpen, img, body, id } = props;
-  const [formValues, setFormValues] = React.useState({
-    body: " ",
-    image: "",
-  });
-  const [file, setFile] = React.useState(null);
-  const [isUploading, setIsUploading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [progress, setProgress] = React.useState(0);
-  const [previewPassport, setPreviewPassport] = React.useState("");
+  const [policyData, setPolicyData] = React.useState(body);
 
   const { enqueueSnackbar } = useSnackbar();
-
-  const handleChange = (e) => {
-    const { id, name, value } = e.target;
-
-    if (id === "image") {
-      setFile(e.target.files[0]);
-      setPreviewPassport(URL.createObjectURL(e.target.files[0]));
-      setFormValues((prevData) => ({
-        ...prevData,
-        image: e.target.value,
-      }));
-    } else {
-      setFormValues((prevData) => ({ ...prevData, [name]: value }));
-    }
-  };
 
   React.useEffect(() => {
     setIsLoading(false);
   }, []);
 
-  //   const uploadNew = (e) => {
-  //     setIsUploading(true);
-  //     const timeNow = new Date();
-  //     //First upload image to firebase storage then save to firestore
-  //     const storageRef = ref(storage, "categories/img_" + timeNow.getTime());
-  //     const uploadTask = uploadBytesResumable(storageRef, file);
-
-  //     uploadTask.on(
-  //       "state_changed",
-  //       (snapshot) => {
-  //         const uprogress =
-  //           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  //         setProgress(uprogress);
-  //       },
-  //       (error) => {
-  //         setIsUploading(false);
-  //         console.log(error);
-  //         enqueueSnackbar(`${error.message}`, { variant: "error" });
-  //       },
-  //       () => {
-  //         setIsUploading(false);
-  //         setIsLoading(true);
-  //         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-  //           const mRef = doc(db, "categories", "img_" + id);
-  //           try {
-  //             await updateDoc(mRef, {
-  //               title: formValues.title,
-  //               url: downloadURL,
-  //             });
-  //             setOpen(false);
-  //             setIsLoading(false);
-  //             enqueueSnackbar(`Category updated successfully`, {
-  //               variant: "success",
-  //             });
-  //           } catch (error) {
-  //             setIsLoading(false);
-  //             enqueueSnackbar(`Error updating category`, {
-  //               variant: "error",
-  //             });
-  //           }
-  //         });
-  //       }
-  //     );
-  //   };
-
   const updatePolicy = async (e) => {
     setIsLoading(true);
-    setFormValues({
-      body: formValues.body ? formValues.body : body,
-    });
-    // if (!previewPassport) {
+
     //   console.log("ID: ", id);
     const timeNow = new Date();
-    const mRef = doc(db, "others", "privacy-policy");
+    const mRef = doc(db, "others", "privacy");
     try {
       await updateDoc(mRef, {
-        body: formValues.body,
+        body: policyData,
         updatedAt: timeNow,
       });
-      setOpen(false);
       setIsLoading(false);
       enqueueSnackbar(`Privacy policy updated successfully`, {
         variant: "success",
       });
+      history.goBack();
     } catch (error) {
       setIsLoading(false);
-      enqueueSnackbar(`${error?.message || "Error updating privacy policy"}`, {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        `${error?.message || "Check your internet connection!"}`,
+        {
+          variant: "error",
+        }
+      );
     }
-    // }
-    // else {
-    //   setFormValues({ title: formValues.title ? formValues.title : name });
-    //   const fileRef = ref(storage, "categories/img_" + id);
-
-    //   deleteObject(fileRef)
-    //     .then(() => {
-    //       // File deleted now upload new file,
-    //       //get download url and save to firestore
-    //       setIsLoading(false);
-    //       uploadNew();
-    //     })
-    //     .catch((error) => {
-    //       setIsLoading(false);
-    //       console.log("ErR: ", error);
-    //     });
-    // }
   };
 
   return (
-    <div style={{ width: 512 }}>
-      <Backdrop style={{ zIndex: 1200 }} open={isUploading || isLoading}>
-        {/* {isUploading ? <CircularProgressWithLabel value={progress} /> : <div />} */}
+    <div>
+      <Backdrop style={{ zIndex: 1200 }} open={isLoading}>
         {isLoading ? (
           <CircularProgress
             size={90}
@@ -197,60 +66,36 @@ const UpdatePolicyForm = (props) => {
         )}
       </Backdrop>
       <ValidatorForm onSubmit={updatePolicy}>
-        <TextValidator
-          className={classes.mb}
-          fullWidth
-          multiline
-          rows={8}
-          rowsMax={12}
-          placeholder="Type policy here"
-          name="body"
-          label="Privacy policy"
-          value={
-            formValues.body === " "
-              ? body
-              : !formValues.body
-              ? ""
-              : formValues.body
-          }
-          onChange={handleChange}
-          variant="outlined"
-          validators={["required"]}
-          errorMessages={["Privacy policy is required"]}
-        />
-        {/* <br />
-        <TextValidator
-          id="image"
-          size="small"
-          variant="outlined"
-          value={formValues.image}
-          name="image"
-          type="file"
-          fullWidth
-          disabled={isLoading}
-          accept=".png, .jpg, .jpeg, .pdf"
-          onChange={handleChange}
-          //   validators={["required"]}
-          //   errorMessages={["Category image is required"]}
-          helperText="Upload category image"
-        /> */}
-
-        {/* <div>
-          <Avatar
-            variant="rounded"
-            alt="Passport"
-            src={previewPassport ? previewPassport : img}
-            className={classes.image}
-          />
-        </div> */}
+        <Box
+          width={"100%"}
+          display="flex"
+          flexDirection="row"
+          justifyContent="start"
+          alignItems={"start"}
+          paddingBottom={2}
+        >
+          <Button
+            disableElevation
+            variant="text"
+            startIcon={<ArrowBackIosNew />}
+            onClick={() => history.goBack()}
+          >
+            Back
+          </Button>
+          <Typography px={4} variant="h6">
+            Update Privacy Policy
+          </Typography>
+        </Box>
+        <QuillEditable setValue={setPolicyData} value={policyData} />
+        <br />
         <br />
         <Button
           type="submit"
           variant="contained"
-          disabled={isLoading || isUploading}
+          disabled={isLoading}
           fullWidth
         >
-          Save
+          Update Now
         </Button>
       </ValidatorForm>
     </div>

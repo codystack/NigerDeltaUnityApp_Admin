@@ -27,8 +27,7 @@ import { CircularProgress } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Grid } from "@mui/material";
 import { MenuItem } from "@mui/material";
-// import { FirebaseError } from "@firebase/util";
-// import QuillEditor from "../../components/misc/richtext/quill";
+
 import QuillEditable from "../../components/misc/richtext/edit_quill";
 import { useHistory, useLocation } from "react-router-dom";
 import { ArrowBackIosNew } from "@mui/icons-material";

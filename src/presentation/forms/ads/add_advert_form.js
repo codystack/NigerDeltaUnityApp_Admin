@@ -128,10 +128,6 @@ const CreateAdsForm = (props) => {
     }
   };
 
-  // React.useEffect(() => {
-  //   console.log("HJF", formValues.starts);
-  // }, []);
-
   const createAds = (e) => {
     setIsUploading(true);
 

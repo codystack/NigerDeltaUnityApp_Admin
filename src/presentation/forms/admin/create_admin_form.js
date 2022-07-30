@@ -1,22 +1,29 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import {
+  ValidatorForm,
+  TextValidator,
+  SelectValidator,
+} from "react-material-ui-form-validator";
 import Backdrop from "@mui/material/Backdrop";
 import { makeStyles } from "@mui/styles";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { auth, ref, db, doc, setDoc, getDoc } from "../../../data/firebase";
+import { db, doc, setDoc, getDoc } from "../../../data/firebase";
 import { createUser } from "../../../domain/service";
 import { useSnackbar } from "notistack";
+import { MenuItem } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   mb: {
     marginBottom: 10,
   },
 }));
+
+const userTypes = ["Admin", "Editor"];
 
 const CreateAdminForm = (props) => {
   const { setOpen } = props;
@@ -30,6 +37,7 @@ const CreateAdminForm = (props) => {
     email: "",
     phone: "",
     password: "",
+    userType: "",
   });
 
   const { enqueueSnackbar } = useSnackbar();
@@ -56,7 +64,7 @@ const CreateAdminForm = (props) => {
             phone: formValues.phone,
             email: formValues.email,
             password: formValues.password,
-            userType: "admin",
+            userType: formValues.userType,
             isBlocked: false,
             createdAt: timeNow,
             updatedAt: timeNow,
@@ -67,7 +75,7 @@ const CreateAdminForm = (props) => {
               const docRef = doc(db, "users", resp?.user?.uid);
               const docSnap = await getDoc(docRef);
               if (docSnap.exists()) {
-                enqueueSnackbar(`Admin created successfully`, {
+                enqueueSnackbar(`New user created successfully`, {
                   variant: "success",
                 });
               }
@@ -175,6 +183,25 @@ const CreateAdminForm = (props) => {
           validators={["required"]}
           errorMessages={["Phone number is required"]}
         />
+
+        <SelectValidator
+          margin="normal"
+          value={formValues.userType}
+          onChange={handleChange}
+          label="Role"
+          name="userType"
+          fullWidth
+          variant="outlined"
+          size="small"
+          validators={["required"]}
+          errorMessages={["User role is required"]}
+        >
+          {userTypes?.map((item, index) => (
+            <MenuItem key={index} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </SelectValidator>
 
         <TextValidator
           margin="normal"

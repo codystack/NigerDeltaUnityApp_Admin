@@ -57,8 +57,8 @@ const IOSSwitch = styled((props) => (
 
 export default function CustomizedSwitch(props) {
   let { value, setValue } = props;
-  const handleChange = (value) => {
-    setValue(value);
+  const handleChange = (val) => {
+    setValue(val?.target.checked);
   };
   return (
     <FormGroup>

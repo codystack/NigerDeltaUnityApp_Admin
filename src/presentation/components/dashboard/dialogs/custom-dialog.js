@@ -1,24 +1,14 @@
 import React from "react";
-import { makeStyles, useTheme } from "@mui/styles";
+import { makeStyles } from "@mui/styles";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Modal from "@mui/material/Modal";
 
-function rand() {
-  return Math.round(Math.random() * 20) - 10;
-}
-
 function getModalStyle() {
-  const top = 50 + rand();
-  const left = 50 + rand();
-
   return {
-    //top: `${top}%`,
     margin: "auto",
     minWidth: 200,
-    //left: `${left}%`,
-    //transform: `translate(-${top}%, -${left}%)`,
   };
 }
 
